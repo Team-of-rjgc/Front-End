@@ -1,6 +1,6 @@
 <template>
   <div class="bg">
-    test-详情 
+    个人信息
   </div>
 </template>
 

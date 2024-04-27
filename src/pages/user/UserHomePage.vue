@@ -1,7 +1,8 @@
 <template>
   <div class="bg">
-    test-详情 
+    我的主页
   </div>
+  <el-backtop :right="100" :bottom="100" />
 </template>
 
 <script setup>

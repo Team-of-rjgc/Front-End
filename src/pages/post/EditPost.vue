@@ -1,6 +1,6 @@
 <template>
   <div class="bg">
-    test-详情 
+    发布/编辑帖子
   </div>
 </template>
 

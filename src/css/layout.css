@@ -1,0 +1,8 @@
+.bg {
+    margin: 70px auto 40px;
+    padding: 10px 20px;
+    min-height: 500px;
+
+    background-color: #fff;
+    border-radius: 5px;
+}
