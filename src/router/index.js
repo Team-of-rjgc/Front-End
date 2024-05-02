@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
-import MainContainer from '../components/MainContainer.vue'
+// import MainContainer from '../components/MainContainer.vue'
 import HomePage from '../pages/HomePage.vue'
 import PostDetail from '../pages/post/PostDetail.vue'
 import Lost from '../pages/post/Lost.vue'
