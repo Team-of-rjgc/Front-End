@@ -5,7 +5,7 @@
     align-center
     center
   >
-    <div v-if="loginDialog" class="main-view">
+    <div v-if="loginDialog && !forgetDialog" class="main-view">
       <h2 class="title">登录</h2>
       <el-form :model="login" ref="loginFormRef" :rules="loginRules">
         <el-form-item prop="account">
@@ -16,10 +16,13 @@
         </el-form-item>
         <el-button type="primary" @click="toLogin(loginFormRef)" class="confirm-btn">确定</el-button>
       </el-form>
-      <div class="switch-btn" @click="loginDialog = false">没有账号？去注册</div>
+      <div class="footer">
+        <div class="switch-btn" @click="loginDialog = false; forgetDialog = false">没有账号？去注册</div>
+        <div class="switch-btn" @click="forgetDialog = true; loginDialog = false">忘记密码</div>
+      </div>
     </div>
 
-    <div v-else class="main-view">
+    <div v-if="!loginDialog && !forgetDialog" class="main-view">
       <h2 class="title">注册</h2>
       <el-form :model="register" ref="registerFormRef" :rules="registerRules">
         <el-form-item prop="email">
@@ -30,14 +33,39 @@
           <el-button class="get-verification-btn" @click="getCode" :disabled="codeBtn.disabled">{{ codeBtn.msg }}</el-button>
         </el-form-item>
         <el-form-item prop="pwd">
-          <el-input v-model="register.pwd" placeholder="密码" type="password" show-password clearable class="input-box"></el-input>
+          <el-input v-model="register.pwd" placeholder="密码（6-16位的数字或字母）" type="password" show-password clearable class="input-box"></el-input>
         </el-form-item>
         <el-form-item prop="checkPwd">
           <el-input v-model="register.checkPwd" placeholder="确认密码" type="password" show-password clearable class="input-box" @keyup.enter="toRegister(registerFormRef)"></el-input>
         </el-form-item>
         <el-button type="primary" @click="toRegister(registerFormRef)" class="confirm-btn">确定</el-button>
       </el-form>
-      <div class="switch-btn" @click="loginDialog = true">已有账号？去登录</div>
+      <div class="switch-btn" @click="loginDialog = true; forgetDialog = false">已有账号？去登录</div>
+    </div>
+
+    <div v-if="!loginDialog && forgetDialog" class="main-view forget-view">
+      <div class="align-center go-back" @click="loginDialog = true; forgetDialog = false">
+        <el-icon><ArrowLeft /></el-icon>
+        返回
+      </div>
+      <h2 class="title">忘记密码</h2>
+      <el-form :model="register" ref="registerFormRef" :rules="registerRules">
+        <el-form-item prop="email">
+          <el-input v-model="register.email" placeholder="邮箱" clearable class="input-box"></el-input>
+        </el-form-item>
+        <el-form-item prop="veriCode" style="width: 400px;" class="email">
+          <el-input v-model="register.veriCode" placeholder="验证码" clearable class="input-box"></el-input>
+          <el-button class="get-verification-btn" @click="getCode" :disabled="codeBtn.disabled">{{ codeBtn.msg }}</el-button>
+        </el-form-item>
+        <el-form-item prop="pwd">
+          <el-input v-model="register.pwd" placeholder="密码（6-16位的数字或字母）" type="password" show-password clearable class="input-box"></el-input>
+        </el-form-item>
+        <el-form-item prop="checkPwd">
+          <el-input v-model="register.checkPwd" placeholder="确认密码" type="password" show-password clearable class="input-box" @keyup.enter="toRegister(registerFormRef)"></el-input>
+        </el-form-item>
+        <el-button type="primary" @click="forgetPwd(registerFormRef)" class="confirm-btn">确定</el-button>
+      </el-form>
+      
     </div>
   </el-dialog>
 </template>
@@ -45,8 +73,10 @@
 <script setup>
 import { useStore } from "vuex"
 import { reactive, ref, watch } from "vue";
+import { ArrowLeft } from '@element-plus/icons-vue'
 
 let loginDialog = ref(true)
+let forgetDialog = ref(false)
 const loginFormRef = ref()
 const registerFormRef = ref()
 
@@ -176,6 +206,7 @@ function toLogin(formEl) {
         duration: 800
       })
       store.state.LoginRegisterVisible = false
+      store.state.isLogin = true
     } else {
       return false
     }
@@ -212,16 +243,23 @@ watch(() => store.state.LoginRegisterVisible, (newVal, oldVal) => {
   }
 })
 
-watch(() => loginDialog.value, (newVal) => {
+watch(() => loginDialog.value, () => {
   // 切换登录/注册页时 清空model数据
-  if (newVal) {
-    for (const key in register) {
-      register[key] = ''
-    }
-  } else {
-    for (const key in login) {
+  for (const key in register) {
+    register[key] = ''
+  }
+  for (const key in login) {
+    login[key] = ''
+  }
+})
+
+watch(() => forgetDialog.value, () => {
+  // 清空model数据
+  for (const key in login) {
       login[key] = ''
     }
+  for (const key in register) {
+    register[key] = ''
   }
 })
 </script>
@@ -265,5 +303,34 @@ watch(() => loginDialog.value, (newVal) => {
 
 .email .input-box {
   width: 275px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 0 80px;
+  width: 100%;
+}
+
+.forget-view {
+  position: relative;
+}
+
+.go-back {
+  position: absolute;
+  top: -18px;
+  left: 50px;
+
+  font-size: 14px;
+  color: rgb(168, 171, 178);
+  cursor: pointer;
+
+  transition: all .15s;
+}
+
+.go-back:hover {
+  color: var(--el-color-primary-light-3);
+  transition: all .15s;
 }
 </style>

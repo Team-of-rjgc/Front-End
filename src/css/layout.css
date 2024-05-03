@@ -8,3 +8,15 @@
     background-color: #fff;
     border-radius: 5px;
 }
+
+.align-center {
+    display: flex;
+    align-items: center;
+}
+
+.justfy-align-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

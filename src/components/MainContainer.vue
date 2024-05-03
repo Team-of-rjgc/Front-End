@@ -57,7 +57,7 @@
               <el-dropdown-menu>
                 <el-dropdown-item><router-link to="/UserInfo"><el-icon><User /></el-icon>个人信息</router-link></el-dropdown-item>
                 <el-dropdown-item><router-link to="/UserHomePage"><el-icon><House /></el-icon>我的主页</router-link></el-dropdown-item>
-                <el-dropdown-item divided><el-icon><Switch /></el-icon>退出登录</el-dropdown-item>
+                <el-dropdown-item divided @click="logOut"><el-icon><Switch /></el-icon>退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
         </el-dropdown>
@@ -106,7 +106,16 @@ function toEdit() {
   }
 }
 
-// console.log(store.state.isLogin)
+function logOut() {
+
+  ElMessage({
+    showClose: true,
+    message: '退出登录成功！',
+    type: 'success',
+    duration: 800
+  })
+  store.state.isLogin = false
+}
 
 </script>
 

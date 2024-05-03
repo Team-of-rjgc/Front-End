@@ -9,6 +9,8 @@ import EditPost from '../pages/post/EditPost.vue'
 
 import UserInfo from '../pages/user/UserInfo.vue'
 import UserHomePage from '../pages/user/UserHomePage.vue'
+import BasicInfo from '../pages/user/BasicInfo.vue'
+import ResetPassword from '../pages/user/ResetPassword.vue'
 
 
 const routes = [
@@ -49,6 +51,10 @@ const routes = [
     path: '/UserInfo',
     name: 'UserInfo',
     component: UserInfo,
+    children: [
+      { path: 'BasicInfo', component: BasicInfo },
+      { path: 'ResetPassword', component: ResetPassword }
+    ]
   },
   {
     path: '/UserHomePage',
