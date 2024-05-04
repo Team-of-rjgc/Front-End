@@ -12,15 +12,14 @@ import UserHomePage from '../pages/user/UserHomePage.vue'
 import BasicInfo from '../pages/user/BasicInfo.vue'
 import ResetPassword from '../pages/user/ResetPassword.vue'
 
+import Inform from '../pages/Inform.vue'
+import SearchResult from '../pages/post/SearchResult.vue'
+
 
 const routes = [
-  // {
-  //   path: '/',
-  //   redirect: '/MainContainer'
-  // },
   {
     path: '/',
-    component: Lost,
+    redirect: '/Lost',
   },
   {
     path: '/HomePage',
@@ -60,6 +59,16 @@ const routes = [
     path: '/UserHomePage',
     name: 'UserHomePage',
     component: UserHomePage,
+  },
+  {
+    path: '/Inform',
+    name: 'Inform',
+    component: Inform,
+  },
+  {
+    path: '/SearchResult',
+    name: 'SearchResult',
+    component: SearchResult,
   },
 ]
 

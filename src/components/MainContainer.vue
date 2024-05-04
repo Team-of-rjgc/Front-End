@@ -16,6 +16,8 @@
             style="min-width: 400px"
             placeholder="搜索帖子"
             class="input-with-select"
+            clearable
+            @keyup.enter="toSearch"
           >
             <template #prepend>
               <el-icon :size="16"><Search /></el-icon>
@@ -29,27 +31,10 @@
       <div class="hearder-right">
         <div class="items flex-btn" active-class="active" @click="toEdit"><el-icon class="icon"><Edit /></el-icon>发布</div>
         
-        <el-dropdown v-if="$store.state.isLogin">
-          <el-badge :value="notificationNum" :max="10" class="item notification-icon el-dropdown-link" type="primary">
-            <el-icon class="icon"><Bell /></el-icon>
-          </el-badge>
-            <template #dropdown>
-              <el-dropdown-menu class="notification-menu">
-                <li class="notification-item">
-                  <h4>通知标题1</h4>
-                  <div class="notification-detail">通知内容1</div>
-                </li>
-                <li class="notification-item">
-                  <h4>通知标题2</h4>
-                  <div class="notification-detail">通知内容2通知内容2通知内容2通知内容2通知内容2通知内容2通知内容2通知内容2通知内容2</div>
-                </li>
-                <li class="notification-item">
-                  <h4>通知标题3</h4>
-                  <div class="notification-detail">通知内容3</div>
-                </li>
-              </el-dropdown-menu>
-            </template>
-        </el-dropdown>
+        <router-link to="/Inform" class="items" active-class="active" v-if="$store.state.isLogin">
+          <el-badge :value="notificationNum" :max="10" class="notification-icon" type="primary"><el-icon class="icon"><Bell /></el-icon>通知</el-badge>
+          
+        </router-link>
       
         <el-dropdown v-if="$store.state.isLogin">
           <el-avatar class="el-dropdown-link avatar" :size="30" shape="square" :src="avatarUrl" />
@@ -94,6 +79,7 @@ let notificationNum = 2
 
 function toSearch() {
   console.log(searchInput.value)
+  router.push('/SearchResult')
   
 }
 
@@ -115,6 +101,7 @@ function logOut() {
     duration: 800
   })
   store.state.isLogin = false
+  router.push('/Lost')
 }
 
 </script>
@@ -166,7 +153,6 @@ function logOut() {
 }
 
 .header-content .items:hover {
-  /* color: rgb(94, 115, 134); */
   color: rgb(160, 207, 255);
   
   border-color: rgb(160, 207, 255);
@@ -179,6 +165,7 @@ function logOut() {
 }
 
 .avatar {
+  margin-left: 10px;
   border-color: transparent;
   outline: none;
 }
@@ -211,8 +198,6 @@ function logOut() {
 }
 
 .notification-icon {
-  margin-right: 40px;
-
   cursor: pointer;
   outline: none;
 }

@@ -34,6 +34,16 @@
 
 <script setup>
 import { InfoFilled, Tools } from '@element-plus/icons-vue'
+import router from '../../router'
+import { useStore } from "vuex"
+const store = useStore()
+
+if (!store.state.isLogin) {
+  router.push('/Lost')
+  store.state.LoginRegisterVisible = true
+} else {
+  router.push('/UserInfo/BasicInfo')
+}
 </script>
 
 <style>
@@ -47,11 +57,21 @@ import { InfoFilled, Tools } from '@element-plus/icons-vue'
 }
 
 .el-menu a {
+  padding-left: 20px;
+
   color: rgb(120, 131, 135);
   font-weight: 700;
+
+  border-left: 4px solid transparent;
 }
 
 aside {
+  margin-left: -20px;
   border-right: 1px solid rgb(220, 223, 230);
+}
+
+.el-menu .active  {
+  border-left: 4px solid rgb(220, 223, 230);
+  transition: all .2s;
 }
 </style>

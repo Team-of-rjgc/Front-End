@@ -1,6 +1,6 @@
 <template>
     <div id="info-layout">
-      <h2>个人信息</h2>
+      <h2>基本信息</h2>
       <el-container class="info-box">
         <el-main class="main justfy-align-center">
           <el-form :model="form" ref="uploadForm" style="width: 400px;">
@@ -41,6 +41,14 @@
 <script setup lang='ts'>
 import { reactive, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
+import router from '../../router'
+import { useStore } from "vuex"
+const store = useStore()
+
+if (!store.state.isLogin) {
+  router.push('/Lost')
+  store.state.LoginRegisterVisible = true
+}
 
 // 获取表单DOM元素
 const uploadForm = ref()

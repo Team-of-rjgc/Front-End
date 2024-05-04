@@ -1,31 +1,42 @@
 <template>
-  <div class="justfy-align-center wrapper">
+  
+  <div class="wrapper">
     <h2 class="title">重置密码</h2>
-    <el-form :model="form" label-width="100px" ref="ruleFormRef" :rules="rules" class="justfy-align-center">
-      <el-form-item label="原密码：" prop="oldPwd" autocomplete="off">
-        <el-input v-model="form.oldPwd" type="password" placeholder="输入原密码" show-password style="width: 220px;" @keyup.enter="onSubmit"/>
-      </el-form-item>
-      <el-form-item label="新密码：" prop="newPwd" autocomplete="off">
-        <el-input v-model="form.newPwd" type="password" placeholder="输入6-16位任意数字或字母" show-password style="width: 220px;" @keyup.enter="onSubmit"/>
-      </el-form-item>
-      <el-form-item label="确认密码：" prop="checkPwd" autocomplete="off">
-        <el-input
-          v-model="form.checkPwd"
-          type="password"
-          autocomplete="off"
-          placeholder="再次输入密码"
-          show-password
-          style="width: 220px;"
-          @keyup.enter="onSubmit"
-        />
-      </el-form-item>
-      <el-button @click="onSubmit" style="width: 150px; margin-top: 40px;">确认</el-button>
-    </el-form>
+    <el-main class="justfy-align-center">
+      <el-form :model="form" label-width="100px" ref="ruleFormRef" :rules="rules" class="justfy-align-center">
+        <el-form-item label="原密码：" prop="oldPwd" autocomplete="off">
+          <el-input v-model="form.oldPwd" type="password" placeholder="输入原密码" show-password style="width: 220px;" @keyup.enter="onSubmit"/>
+        </el-form-item>
+        <el-form-item label="新密码：" prop="newPwd" autocomplete="off">
+          <el-input v-model="form.newPwd" type="password" placeholder="输入6-16位任意数字或字母" show-password style="width: 220px;" @keyup.enter="onSubmit"/>
+        </el-form-item>
+        <el-form-item label="确认密码：" prop="checkPwd" autocomplete="off">
+          <el-input
+            v-model="form.checkPwd"
+            type="password"
+            autocomplete="off"
+            placeholder="再次输入密码"
+            show-password
+            style="width: 220px;"
+            @keyup.enter="onSubmit"
+          />
+        </el-form-item>
+        <el-button @click="onSubmit" style="width: 150px; margin-top: 40px;">确认</el-button>
+      </el-form>
+    </el-main>
   </div>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
+import router from '../../router'
+import { useStore } from "vuex"
+const store = useStore()
+
+if (!store.state.isLogin) {
+  router.push('/Lost')
+  store.state.LoginRegisterVisible = true
+}
 
 // 获取表单元素
 const ruleFormRef = ref()
@@ -90,10 +101,16 @@ const onSubmit = () => {
 
 <style>
 .wrapper {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
   height: 100%;
 }
 
 .title {
-  margin-bottom: 60px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+  color: rgb(86, 86, 86);
 }
 </style>

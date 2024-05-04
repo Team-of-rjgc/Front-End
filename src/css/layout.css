@@ -14,6 +14,11 @@
     align-items: center;
 }
 
+.justify-center {
+    display: flex;
+    justify-content: center;
+}
+
 .justfy-align-center {
     display: flex;
     flex-direction: column;
