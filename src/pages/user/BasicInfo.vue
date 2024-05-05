@@ -2,7 +2,7 @@
     <div id="info-layout">
       <h2>基本信息</h2>
       <el-container class="info-box">
-        <el-main class="main justfy-align-center">
+        <el-main class="main justify-align-center">
           <el-form :model="form" ref="uploadForm" style="width: 400px;">
             <el-form-item label="头像：" ref="uploadEle">
               <el-upload class="avatar-uploader"

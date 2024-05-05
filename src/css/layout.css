@@ -19,7 +19,7 @@
     justify-content: center;
 }
 
-.justfy-align-center {
+.justify-align-center {
     display: flex;
     flex-direction: column;
     justify-content: center;

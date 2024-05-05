@@ -2,8 +2,8 @@
   
   <div class="wrapper">
     <h2 class="title">重置密码</h2>
-    <el-main class="justfy-align-center">
-      <el-form :model="form" label-width="100px" ref="ruleFormRef" :rules="rules" class="justfy-align-center">
+    <el-main class="justify-align-center">
+      <el-form :model="form" label-width="100px" ref="ruleFormRef" :rules="rules" class="justify-align-center">
         <el-form-item label="原密码：" prop="oldPwd" autocomplete="off">
           <el-input v-model="form.oldPwd" type="password" placeholder="输入原密码" show-password style="width: 220px;" @keyup.enter="onSubmit"/>
         </el-form-item>
