@@ -6,8 +6,6 @@
           <router-link to="/Lost" class="items" active-class="active">失物招领</router-link>
           <router-link to="/Found" class="items" active-class="active">寻物启事</router-link>
         </div>
-
-        
       </div>
 
       <div class="mt-4 search-box">
@@ -127,6 +125,8 @@ function logOut() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  height: 100%;
 }
 
 .header-left,

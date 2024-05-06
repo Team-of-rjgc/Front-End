@@ -1,7 +1,7 @@
 <template>
   <div class="bg">
     <div class="all-post" v-if="!ifEmpty">
-      <div class="post-box" v-for="post in postList">
+      <li class="post-box" v-for="post in postList">
         <div class="post-left-part">
           <div class="post-main">
             <h3 class="post-title">{{ post.title }}</h3>
@@ -13,9 +13,9 @@
           </div>
         </div>
         <div class="post-right-part">
-          <img class="post-img" :src="post.imgUrl" alt="">
+          <img class="post-img" v-if="post.imgUrl" :src="post.imgUrl">
         </div>
-      </div>
+      </li>
     </div>
     
     <div class="justify-align-center" v-else>
@@ -35,14 +35,14 @@ let ifEmpty = false
 let postList = reactive([
   {
     title: '帖子1标题标题标题要记得限制字数',
-    content: '捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱',
+    content: '丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱',
     author: '作者名作者名作者名作者名作者名',
     time: '2024-5-6 00:00',
     imgUrl: 'https://img2.imgtp.com/2024/05/06/5NfmuCD7.jpg'
   },
   {
     title: '帖子2标题标题标题要记得限制字数',
-    content: '捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱捡到100块钱',
+    content: '丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱',
     author: '作者名不知道',
     time: '2024-5-6 00:00',
     imgUrl: 'https://img2.imgtp.com/2024/05/06/v3FUgkBW.png'
@@ -60,9 +60,7 @@ let postList = reactive([
   justify-content: space-between;
 
   padding: 10px 20px;
-  /* width: 95%; */
   height: 120px;
-  /* border-top: 1px solid rgba(0, 0, 0, .1); */
   border-bottom: 1px solid rgba(0, 0, 0, .1);
 
   transition: all .2s;
@@ -123,5 +121,9 @@ let postList = reactive([
 
 .info .time {
   margin-left: 15px;
+
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
 }
 </style>
