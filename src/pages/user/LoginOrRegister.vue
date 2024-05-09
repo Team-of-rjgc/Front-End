@@ -320,7 +320,7 @@ watch(() => forgetDialog.value, () => {
 .go-back {
   position: absolute;
   top: -18px;
-  left: 50px;
+  left: 0;
 
   font-size: 14px;
   color: rgb(168, 171, 178);

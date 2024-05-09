@@ -4,8 +4,8 @@
     <h2 class="title">重置密码</h2>
     <el-main class="justify-align-center">
       <el-form :model="form" label-width="100px" ref="ruleFormRef" :rules="rules" class="justify-align-center">
-        <el-form-item label="原密码：" prop="oldPwd" autocomplete="off">
-          <el-input v-model="form.oldPwd" type="password" placeholder="输入原密码" show-password style="width: 220px;" @keyup.enter="onSubmit"/>
+        <el-form-item label="邮箱：" prop="email" autocomplete="off">
+          <el-input v-model="form.email" placeholder="输入邮箱" style="width: 220px;" @keyup.enter="onSubmit"/>
         </el-form-item>
         <el-form-item label="新密码：" prop="newPwd" autocomplete="off">
           <el-input v-model="form.newPwd" type="password" placeholder="输入6-16位任意数字或字母" show-password style="width: 220px;" @keyup.enter="onSubmit"/>
@@ -42,15 +42,18 @@ if (!store.state.isLogin) {
 const ruleFormRef = ref()
 
 const form = reactive({
-  oldPwd: '',
+  email: '',
   newPwd: '',
   checkPwd: ''
 })
 
 const rules = reactive({
-  oldPwd: [{ validator: (rule, value, callback) => {
+  email: [{ validator: (rule, value, callback) => {
+        const reg = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
         if (value === '') {
-            callback(new Error('请输入原密码！'))
+          callback(new Error('请输入邮箱！'))
+        } else if (!reg.test(value)) {
+          callback(new Error('邮箱格式有误！'))
         } else {
             callback()
         }

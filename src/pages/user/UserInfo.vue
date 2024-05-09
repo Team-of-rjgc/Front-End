@@ -41,8 +41,6 @@ const store = useStore()
 if (!store.state.isLogin) {
   router.push('/Lost')
   store.state.LoginRegisterVisible = true
-} else {
-  router.push('/UserInfo/BasicInfo')
 }
 </script>
 
