@@ -165,11 +165,7 @@ function handlePictureCardPreview (uploadFile) {
 function getFile(file) {
   getBase64(file.raw).then(res => {
     console.log(res)
-    // 去掉"data:image/png;base64,"前缀
-    const params = res.split(',')
-    if (params.length > 0) {
-      post.images.push(params[1])
-    }
+    post.images.push(res)
   })
 }
 
@@ -193,7 +189,7 @@ function getBase64(file) {
 </script>
 
 <style scoped>
-.el-form >>> .el-form-item__label {
+:deep(.el-form .el-form-item__label) {
   width: 80px;
   text-align: justify;
   text-align-last: justify;
@@ -204,7 +200,7 @@ function getBase64(file) {
   padding-right: 10px;
 }
 
-.el-form >>> .el-form-item__label:after {
+:deep(.el-form .el-form-item__label:after) {
   content:'：';
   position: absolute;
   right: -10px;

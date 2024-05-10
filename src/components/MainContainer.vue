@@ -165,7 +165,7 @@ function logOut() {
   border-color: transparent;
 }
 
-.login-register-btn {
+.header-content .login-register-btn {
   width: 95px;
 }
 

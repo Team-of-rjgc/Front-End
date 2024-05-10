@@ -4,21 +4,28 @@
     <h2 class="title">重置密码</h2>
     <el-main class="justify-align-center">
       <el-form :model="form" label-width="100px" ref="ruleFormRef" :rules="rules" class="justify-align-center">
-        <el-form-item label="邮箱：" prop="email" autocomplete="off">
-          <el-input v-model="form.email" placeholder="输入邮箱" style="width: 220px;" @keyup.enter="onSubmit"/>
+        <el-form-item label="邮箱" prop="email" autocomplete="off">
+          <el-input v-model="form.email" placeholder="输入邮箱" @keyup.enter="onSubmit"
+           class="input-box"/>
         </el-form-item>
-        <el-form-item label="新密码：" prop="newPwd" autocomplete="off">
-          <el-input v-model="form.newPwd" type="password" placeholder="输入6-16位任意数字或字母" show-password style="width: 220px;" @keyup.enter="onSubmit"/>
+        <el-form-item  label="验证码" prop="veriCode" class="email">
+          <el-input v-model="form.veriCode" placeholder="验证码" clearable class="input-box"></el-input>
+          <el-button class="get-verification-btn" @click="getCode" :disabled="codeBtn.disabled">{{ codeBtn.msg }}</el-button>
         </el-form-item>
-        <el-form-item label="确认密码：" prop="checkPwd" autocomplete="off">
+        <el-form-item label="新密码" prop="newPwd" autocomplete="off">
+          <el-input v-model="form.newPwd" type="password" placeholder="输入6-16位任意数字或字母" show-password @keyup.enter="onSubmit"
+           class="input-box"/>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="checkPwd" autocomplete="off">
           <el-input
             v-model="form.checkPwd"
             type="password"
             autocomplete="off"
             placeholder="再次输入密码"
             show-password
-            style="width: 220px;"
+           
             @keyup.enter="onSubmit"
+             class="input-box"
           />
         </el-form-item>
         <el-button @click="onSubmit" style="width: 150px; margin-top: 40px;">确认</el-button>
@@ -43,44 +50,62 @@ const ruleFormRef = ref()
 
 const form = reactive({
   email: '',
+  veriCode: '',
   newPwd: '',
   checkPwd: ''
 })
 
+// 获取验证码按钮相关
+let codeBtn = reactive({
+  disabled: true,
+  msg: '获取验证码'
+})
+
 const rules = reactive({
   email: [{ validator: (rule, value, callback) => {
-        const reg = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
-        if (value === '') {
-          callback(new Error('请输入邮箱！'))
-        } else if (!reg.test(value)) {
-          callback(new Error('邮箱格式有误！'))
-        } else {
-            callback()
-        }
-    }, trigger: 'blur' }],
+    const reg = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+    if (value === '') {
+      callback(new Error('请输入邮箱！'))
+    } else if (!reg.test(value)) {
+      // 获取验证码按钮禁用
+      codeBtn.disabled = true
+      callback(new Error('邮箱格式有误！'))
+    } else {
+      // 获取验证码按钮启用
+      codeBtn.disabled = false
+      callback()
+    }
+  }, trigger: 'change' }],
+  veriCode:  [{ validator: (rule, value, callback) => {
+    if (value === '') {
+      callback(new Error('请输入验证码！'))
+    } else {
+      callback()
+    }
+  }, trigger: 'blur' }],
   newPwd: [{ validator: (rule, value, callback) => {
-        const reg = /^[a-zA-Z0-9]{6,16}$/
-        if (value === '') {
-            callback(new Error('请输入新密码！'))
-        } else if (!reg.test(value)) {
-            callback(new Error('请输入6-16位的数字或字母！'))
-        } else {
-            if (form.checkPwd !== '') {
-            if (ruleFormRef.value === '') return
-            ruleFormRef.value.validateField('checkPass', () => null)
-            }
-            callback()
-        }
-    }, trigger: 'blur' }],
+    const reg = /^[a-zA-Z0-9]{6,16}$/
+    if (value === '') {
+      callback(new Error('请输入新密码！'))
+    } else if (!reg.test(value)) {
+      callback(new Error('请输入6-16位的数字或字母！'))
+    } else {
+      if (form.checkPwd !== '') {
+      if (ruleFormRef.value === '') return
+      ruleFormRef.value.validateField('checkPass', () => null)
+      }
+      callback()
+    }
+  }, trigger: 'blur' }],
   checkPwd: [{ validator: (rule, value, callback) => {
-        if (value === '') {
-            callback(new Error('请再次输入密码！'))
-        } else if (value !== form.newPwd) {
-            callback(new Error('两次输入的密码不匹配！'))
-        } else {
-            callback()
-        }
-    }, trigger: 'blur' }]
+    if (value === '') {
+      callback(new Error('请再次输入密码！'))
+    } else if (value !== form.newPwd) {
+      callback(new Error('两次输入的密码不匹配！'))
+    } else {
+      callback()
+    }
+  }, trigger: 'blur' }]
 })
 
 const onSubmit = () => {
@@ -100,9 +125,34 @@ const onSubmit = () => {
     }
   })
 }
+
+function getCode() {
+  // 倒计时
+  if (timer) clearInterval(timer)
+  let countDown = 60
+  timer = setInterval(() => {
+    codeBtn.disabled = true
+    codeBtn.msg = "重新发送(" + countDown + "s)"
+    if (countDown == 0) {
+      codeBtn.disabled = false
+      codeBtn.msg = "获取验证码"
+      clearInterval(timer)
+      timer = null
+      countDown = 60
+    }
+    countDown-- 
+  }, 1000);
+
+
+  ElMessage({
+    showClose: true,
+    message: '获取成功，请前往邮箱查看。',
+    type: 'success',
+  })
+}
 </script>
 
-<style>
+<style scoped>
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -115,5 +165,41 @@ const onSubmit = () => {
   justify-content: center;
   margin-bottom: 40px;
   color: rgb(86, 86, 86);
+}
+
+.email {
+  position: relative;
+}
+
+.get-verification-btn {
+  position: absolute;
+  width: 100px;
+  right: 0px;
+}
+
+:deep(.el-form .el-form-item__label) {
+  margin-right: 20px;
+  width: 80px;
+  text-align: justify;
+  text-align-last: justify;
+  display: block;
+  word-break: break-all;
+  text-justify: distribute;
+  position: relative;
+  padding-right: 10px;
+}
+
+:deep(.el-form .el-form-item__label:after) {
+  content:'：';
+  position: absolute;
+  right: -10px;
+}
+
+.input-box {
+  width: 250px;
+}
+
+.email .input-box {
+  width: 250px;
 }
 </style>

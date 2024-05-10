@@ -119,13 +119,15 @@ const registerRules = reactive({
     if (value === '') {
       callback(new Error('请输入邮箱！'))
     } else if (!reg.test(value)) {
+      // 获取验证码按钮禁用
+      codeBtn.disabled = true
       callback(new Error('邮箱格式有误！'))
     } else {
       // 获取验证码按钮启用
       codeBtn.disabled = false
       callback()
     }
-  }, trigger: 'blur' }],
+  }, trigger: 'change' }],
   veriCode:  [{ validator: (rule, value, callback) => {
     if (value === '') {
       callback(new Error('请输入验证码！'))
@@ -180,6 +182,8 @@ function getCode() {
     }
     countDown-- 
   }, 1000);
+
+  
 
 
   ElMessage({
