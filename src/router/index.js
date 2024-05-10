@@ -83,4 +83,12 @@ const router = createRouter({
   routes,
 });
 
-export default router;
+router.beforeEach((to, from, next) => {
+    if (to.fullPath === '/UserInfo') {
+      next('/UserInfo/BasicInfo')
+    } else {
+      next()
+    }
+})
+
+export default router

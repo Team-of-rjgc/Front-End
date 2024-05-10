@@ -3,8 +3,8 @@
     <div class="header-content">
       <div class="header-left">
         <div class="menu-items">
-          <router-link to="/Lost" class="items" active-class="active">失物招领</router-link>
-          <router-link to="/Found" class="items" active-class="active">寻物启事</router-link>
+          <router-link to="/Lost" class="items" active-class="active">寻物启事</router-link>
+          <router-link to="/Found" class="items" active-class="active">失物招领</router-link>
         </div>
       </div>
 
@@ -27,11 +27,11 @@
         </div>
       
       <div class="hearder-right">
-        <div class="items flex-btn" active-class="active" @click="toEdit"><el-icon class="icon"><Edit /></el-icon>发布</div>
+        <div class="items flex-btn edit-btn" @click="toEdit"><el-icon class="icon"><Edit /></el-icon>发布</div>
         
         <router-link to="/Inform" class="items" active-class="active" v-if="$store.state.isLogin">
-          <el-badge :value="notificationNum" :max="10" class="notification-icon" type="primary"><el-icon class="icon"><Bell /></el-icon>通知</el-badge>
-          
+          <!-- <el-badge :value="notificationNum" :max="10" class="notification-icon" type="primary"><el-icon class="icon"><Bell /></el-icon>通知</el-badge> -->
+          <div class="flex-btn"><el-icon class="icon"><Bell /></el-icon>通知</div>
         </router-link>
       
         <el-dropdown v-if="$store.state.isLogin">
@@ -45,7 +45,7 @@
             </template>
         </el-dropdown>
 
-        <div v-if="!$store.state.isLogin" @click="$store.state.LoginRegisterVisible = true" class="items flex-btn" active-class="active" style="margin-right: 0;">
+        <div v-if="!$store.state.isLogin" @click="$store.state.LoginRegisterVisible = true" class="items flex-btn login-register-btn" active-class="active" style="margin-right: 0;">
           登录/注册
         </div>
       </div>
@@ -73,21 +73,18 @@ const store = useStore()
 const avatarUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png')
 let searchInput = ref('')
 // 未读通知数量
-let notificationNum = 2
+// let notificationNum = 2
 
 function toSearch() {
   console.log(searchInput.value)
-  router.push('/SearchResult')
+  if (searchInput.value) router.push('/SearchResult')
   
 }
 
 function toEdit() {
   // 未登录 跳转到登录页
-  if (!store.state.isLogin) {
-    store.state.LoginRegisterVisible = true
-  } else {
-    router.push('/EditPost')
-  }
+  if (!store.state.isLogin) store.state.LoginRegisterVisible = true
+  else router.push('/EditPost')
 }
 
 function logOut() {
@@ -135,12 +132,17 @@ function logOut() {
   align-items: center;
 }
 
+.header-left .menu-items {
+  width: 250px;
+}
+
 .header-content .items {
   display: inline-block;
   margin-right: 30px;
   padding: 0 10px;
 
   height: 35px;
+  width: 85px;
   line-height: 35px;
 
   font-size: 16px;
@@ -157,6 +159,14 @@ function logOut() {
   
   border-color: rgb(160, 207, 255);
   transition: all .2s;
+}
+
+.header-content .edit-btn:hover {
+  border-color: transparent;
+}
+
+.header-content .login-register-btn {
+  width: 95px;
 }
 
 .header-content .active {
