@@ -88,30 +88,30 @@ const submitComment = () => {
 
 <style scoped>
 .bg {
-  padding-top: 60px; /* 预留导航栏空间 */
+  padding-top: 3.75rem; /* 预留导航栏空间 */
 }
 .post-detail {
-  margin-top: 60px; /* 为导航栏预留空间 */
-  padding: 20px; /* 可以加一些内边距让页面看起来更舒适 */
+  margin-top: 3.75rem; /* 为导航栏预留空间 */
+  padding: 1.25rem; /* 可以加一些内边距让页面看起来更舒适 */
 }
 
 .image-container img {
   width: 100%;
-  max-height: 400px;
+  max-height: 25rem;
   object-fit: cover;
 }
 
 .comments-section .comment {
   display: flex;
   align-items: center;
-  margin-top: 20px; /* 评论之间的留白 */
+  margin-top: 1.25rem; /* 评论之间的留白 */
 }
 
 .comments-section .comment .comment-content {
-  margin-left: 20px;
+  margin-left: 1.25rem;
 }
 
 .comments-section .comment-input {
-  margin-bottom: 10px;
+  margin-bottom: .625rem;
 }
 </style>

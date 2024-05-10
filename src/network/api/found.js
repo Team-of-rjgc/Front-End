@@ -1,8 +1,8 @@
 import { request } from '../request';
-
+//帖子详情
 export function register(data) {
   return request({
-    url: '/api/v1/public/register',
+    url: '/api/v1/user/detail',
     method: 'post',
     data,
   });
@@ -24,14 +24,13 @@ export function getResetEmailCode(email) {
   });
 }
 
-// 图片验证码
-export function getVerifyCode() {
-  return request({
-    url: '/api/v1/public/verifyCode',
-    method: 'get',
-    responseType: 'blob',
-  });
-}
+// // 图片验证码
+// export function getVerifyCode() {
+//   return request({
+//     url: '/api/v1/public/verifyCode',
+//     method: 'get',
+//   });
+// }
 
 export function login(data) {
   return request({
@@ -46,13 +45,5 @@ export function resetPassword(data) {
     url: '/api/v1/public/resetPassword',
     method: 'post',
     data,
-  });
-}
-
-export function setNickName(data) {
-  return request({
-    url: '/api/v1/user/setNickName',
-    method: 'post',
-    params: data,
   });
 }
