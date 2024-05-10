@@ -7,13 +7,18 @@
   >
     <div v-if="loginDialog && !forgetDialog" class="main-view">
       <h2 class="title">登录</h2>
-      <el-form :model="login" ref="loginFormRef" :rules="loginRules">
+      <el-form :model="login" ref="loginFormRef" :rules="loginRules" class="login-form">
         <el-form-item prop="account">
           <el-input v-model="login.account" placeholder="账号" clearable class="input-box"></el-input>
         </el-form-item>
         <el-form-item prop="pwd">
           <el-input v-model="login.pwd" placeholder="密码" type="password" show-password clearable class="input-box" @keyup.enter="toLogin(loginFormRef)"></el-input>
         </el-form-item>
+        <el-form-item prop="code" class="veri-code">
+          <el-input v-model="login.code" placeholder="验证码" clearable class="input-box" @keyup.enter="toLogin(loginFormRef)"></el-input>
+          <img :src="codeUrl" alt="" class="verify-img">
+        </el-form-item>
+        <span class="change-code-img switch-btn" @click=getCodeImg>换一张</span>
         <el-button type="primary" @click="toLogin(loginFormRef)" class="confirm-btn">确定</el-button>
       </el-form>
       <div class="footer">
@@ -30,7 +35,7 @@
         </el-form-item>
         <el-form-item prop="veriCode" style="width: 400px;" class="email">
           <el-input v-model="register.veriCode" placeholder="验证码" clearable class="input-box"></el-input>
-          <el-button class="get-verification-btn" @click="getCode" :disabled="codeBtn.disabled">{{ codeBtn.msg }}</el-button>
+          <el-button class="get-verification-btn" @click="getCode('register')" :disabled="codeBtn.disabled">{{ codeBtn.msg }}</el-button>
         </el-form-item>
         <el-form-item prop="pwd">
           <el-input v-model="register.pwd" placeholder="密码（6-16位的数字或字母）" type="password" show-password clearable class="input-box"></el-input>
@@ -55,7 +60,7 @@
         </el-form-item>
         <el-form-item prop="veriCode" style="width: 400px;" class="email">
           <el-input v-model="register.veriCode" placeholder="验证码" clearable class="input-box"></el-input>
-          <el-button class="get-verification-btn" @click="getCode" :disabled="codeBtn.disabled">{{ codeBtn.msg }}</el-button>
+          <el-button class="get-verification-btn" @click="getCode('reset')" :disabled="codeBtn.disabled">{{ codeBtn.msg }}</el-button>
         </el-form-item>
         <el-form-item prop="pwd">
           <el-input v-model="register.pwd" placeholder="密码（6-16位的数字或字母）" type="password" show-password clearable class="input-box"></el-input>
@@ -76,14 +81,15 @@ import { reactive, ref, watch, inject } from "vue";
 import { ArrowLeft } from '@element-plus/icons-vue'
 
 const $API = inject('$API')
+// vuex的store
+const store = useStore()
 
 let loginDialog = ref(true)
 let forgetDialog = ref(false)
 const loginFormRef = ref()
 const registerFormRef = ref()
 
-// vuex的store
-const store = useStore()
+let codeUrl = ref('http://10.21.32.86:8080/api/v1/public/verifyCode')
 
 let login = reactive({
   account: '',
@@ -109,6 +115,13 @@ const loginRules = reactive({
   pwd: [{ validator: (rule, value, callback) => {
     if (value === '') {
       callback(new Error('请输入密码！'))
+    } else {
+      callback()
+    }
+  }, trigger: 'blur' }],
+  code: [{ validator: (rule, value, callback) => {
+    if (value === '') {
+      callback(new Error('请输入验证码！'))
     } else {
       callback()
     }
@@ -168,8 +181,78 @@ let codeBtn = reactive({
 // 获取验证码按钮倒计时
 let timer = null
 
+// 登录 图片验证码
+function getCodeImg() {
+  codeUrl.value = 'http://10.21.32.86:8080/api/v1/public/verifyCode' + '?'
+}
 
-function getCode() {
+// 发送邮箱验证码
+function getEmailCode(type) {
+  if (type === 'register') {
+    $API.user.getRegisterEmailCode({email: register.email})
+      .then(({data}) => {
+        // console.log(data)
+        if (data.code === 1000) {
+          ElMessage({
+            showClose: true,
+            message: '获取成功，请前往邮箱查看。',
+            type: 'success',
+            duration: 1500
+          })
+        } else {
+          console.log(data.msg)
+          ElMessage({
+            showClose: true,
+            message: data.msg,
+            type: 'error',
+            duration: 1500
+          })
+        }
+      })
+      .catch((err) => {
+        console.log('err', err)
+        ElMessage({
+          showClose: true,
+          message: '获取验证码失败。',
+          type: 'error',
+          duration: 1500
+        })
+      })
+  } else if (type === 'reset') {
+    $API.user.getResetEmailCode({email: register.email})
+      .then(({data}) => {
+        // console.log(data)
+        if (data.code === 1000) {
+          ElMessage({
+            showClose: true,
+            message: '获取成功，请前往邮箱查看。',
+            type: 'success',
+            duration: 1500
+          })
+        } else {
+          console.log(data.msg)
+          ElMessage({
+            showClose: true,
+            message: data.msg,
+            type: 'error',
+            duration: 1500
+          })
+        }
+      })
+      .catch((err) => {
+        console.log('err', err)
+        ElMessage({
+          showClose: true,
+          message: '获取验证码失败。',
+          type: 'error',
+          duration: 1500
+        })
+      })
+  }
+}
+
+// 注册/重置密码 邮箱验证码
+function getCode(type) {
   // 倒计时
   if (timer) clearInterval(timer)
   let countDown = 60
@@ -185,36 +268,9 @@ function getCode() {
     }
     countDown-- 
   }, 1500);
-
-  $API.user.getRegisterEmailCode({email: register.email})
-    .then(({data}) => {
-      // console.log(data)
-      if (data.code === 1000) {
-        ElMessage({
-          showClose: true,
-          message: '获取成功，请前往邮箱查看。',
-          type: 'success',
-          duration: 1500
-        })
-      } else {
-        console.log(data.msg)
-        ElMessage({
-          showClose: true,
-          message: data.msg,
-          type: 'error',
-          duration: 1500
-        })
-      }
-    })
-    .catch((err) => {
-      console.log('err', err)
-      ElMessage({
-        showClose: true,
-        message: '获取验证码失败。',
-        type: 'error',
-        duration: 1500
-      })
-    })
+  console.log(type)
+  
+  getEmailCode(type)
 }
 
 function toLogin(formEl) {
@@ -238,8 +294,13 @@ function toLogin(formEl) {
             })
             store.state.LoginRegisterVisible = false
             store.state.isLogin = true
+            store.state.userInfo = data.data.user
+            // for (let key in data.data.user) {
+            //   if (data.data.user[key]) sessionStorage.setItem(key, data.data.user[key])
+            // }
           } else {
             console.log(data.msg)
+            getCodeImg() // 重新获取验证码
             ElMessage({
               showClose: true,
               message: data.msg,
@@ -273,15 +334,25 @@ function toRegister(formEl) {
         password: register.checkPwd,
         code: register.veriCode
       })
-        .then((data) => {
+        .then(({data}) => {
           // console.log(data)
-          ElMessage({
-            showClose: true,
-            message: '注册成功！正在前往登录页...',
-            type: 'success',
-            duration: 1500
-          })
-          loginDialog.value = true
+          if (data.code === 1000) {
+            ElMessage({
+              showClose: true,
+              message: '注册成功！正在前往登录页...',
+              type: 'success',
+              duration: 1500
+            })
+            loginDialog.value = true
+          } else {
+            console.log(data.msg)
+            ElMessage({
+              showClose: true,
+              message: data.msg,
+              type: 'error',
+              duration: 1500
+            })
+          }
         })
         .catch((err) => {
           console.log('err', err)
@@ -296,7 +367,53 @@ function toRegister(formEl) {
       return false
     }
   })
-  
+}
+
+function forgetPwd(formEl) {
+  if (!formEl) return
+  formEl.validate((valid) => {
+    // 校验成功
+    if (valid) {
+      $API.user.resetPassword({
+        email: register.email,
+        newPassword: register.pwd,
+        confirmPassword: register.checkPwd,
+        code: register.veriCode
+      })
+        .then(({data}) => {
+          // console.log(data)
+          if (data.code === 1000) {
+            ElMessage({
+              showClose: true,
+              message: '重置成功！正在前往登录页...',
+              type: 'success',
+              duration: 1500
+            })
+            loginDialog.value = true
+            forgetDialog.value = false
+          } else {
+            console.log(data.msg)
+            ElMessage({
+              showClose: true,
+              message: data.msg,
+              type: 'error',
+              duration: 1500
+            })
+          }
+        })
+        .catch((err) => {
+          console.log('err', err)
+          ElMessage({
+            showClose: true,
+            message: '重置失败！',
+            type: 'error',
+            duration: 1500
+          })
+        })
+    } else {
+      return false
+    }
+  })
 }
 
 watch(() => store.state.LoginRegisterVisible, (newVal, oldVal) => {
@@ -306,7 +423,7 @@ watch(() => store.state.LoginRegisterVisible, (newVal, oldVal) => {
   }
 })
 
-watch(() => loginDialog.value, () => {
+watch(() => loginDialog.value, (val) => {
   // 切换登录/注册页时 清空model数据
   for (const key in register) {
     register[key] = ''
@@ -324,6 +441,10 @@ watch(() => forgetDialog.value, () => {
   for (const key in register) {
     register[key] = ''
   }
+  // 清空计时器 重置按钮
+  if (timer) clearInterval(timer)
+  codeBtn.disabled = false
+  codeBtn.msg = "获取验证码"
 })
 </script>
 
@@ -346,7 +467,7 @@ watch(() => forgetDialog.value, () => {
 }
 
 .confirm-btn {
-  margin: 20px 0 30px;
+  margin: 10px 0 30px;
   width: 400px;
 }
 
@@ -395,5 +516,30 @@ watch(() => forgetDialog.value, () => {
 .go-back:hover {
   color: var(--el-color-primary-light-3);
   transition: all .15s;
+}
+
+.change-code-img {
+  float: right;
+  display: block;
+}
+
+.login-form {
+  width: 400px;
+}
+
+.verify-img {
+  height: 60px;
+}
+
+.veri-code .el-form-item__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 400px;
+}
+
+.veri-code .input-box {
+  margin-right: 10px;
+  width: 230px;
 }
 </style>

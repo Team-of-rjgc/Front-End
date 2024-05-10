@@ -96,6 +96,8 @@ function logOut() {
     duration: 800
   })
   store.state.isLogin = false
+  store.state.userInfo = {}
+  sessionStorage.clear()
   router.push('/Lost')
 }
 

@@ -54,17 +54,17 @@ if (!store.state.isLogin) {
 const uploadForm = ref()
 
 // 表单绑定的信息-头像
-const form = reactive({
+let form = reactive({
   imageUrl: ''
 })
 
-const info = reactive({
-  name: '我是傻逼我是傻逼我是傻逼我是傻逼',
-  email: '',
+let info = reactive({
+  name: store.state.userInfo.nickName,
+  email: store.state.userInfo.email,
   isEdit: true
 })
 
-const newName = ref(info.name)
+let newName = ref(info.name)
 
 const avatarHeader = reactive({
   Authorization: window.sessionStorage.getItem('token')
