@@ -23,22 +23,23 @@
             autocomplete="off"
             placeholder="再次输入密码"
             show-password
-           
             @keyup.enter="onSubmit"
              class="input-box"
           />
         </el-form-item>
-        <el-button @click="onSubmit" style="width: 150px; margin-top: 40px;">确认</el-button>
+        <el-button type="primary" @click="onSubmit(ruleFormRef)" style="width: 150px; margin-top: 40px;">确认</el-button>
       </el-form>
     </el-main>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, inject } from 'vue'
 import router from '../../router'
 import { useStore } from "vuex"
+
 const store = useStore()
+const $API = inject('$API')
 
 if (!store.state.isLogin) {
   router.push('/Lost')
@@ -60,6 +61,9 @@ let codeBtn = reactive({
   disabled: true,
   msg: '获取验证码'
 })
+
+// 获取验证码按钮倒计时
+let timer = null
 
 const rules = reactive({
   email: [{ validator: (rule, value, callback) => {
@@ -108,18 +112,45 @@ const rules = reactive({
   }, trigger: 'blur' }]
 })
 
-const onSubmit = () => {
-  ruleFormRef.value.validate((valid) => {
+function onSubmit (formEl) {
+  if (!formEl) return
+  formEl.validate((valid) => {
     // 校验成功
     if (valid) {
-      
-
-      ElMessage({
-        showClose: true,
-        message: '重置成功！',
-        type: 'success',
-        duration: 800
+      $API.user.resetPassword({
+        email: form.email,
+        newPassword: form.newPwd,
+        confirmPassword: form.checkPwd,
+        code: form.veriCode
       })
+        .then(({data}) => {
+          // console.log(data)
+          if (data.code === 1000) {
+            ElMessage({
+              showClose: true,
+              message: '重置成功！',
+              type: 'success',
+              duration: 1500
+            })
+          } else {
+            console.log(data.msg)
+            ElMessage({
+              showClose: true,
+              message: data.msg,
+              type: 'error',
+              duration: 1500
+            })
+          }
+        })
+        .catch((err) => {
+          console.log('err', err)
+          ElMessage({
+            showClose: true,
+            message: '重置失败！',
+            type: 'error',
+            duration: 1500
+          })
+        })
     } else {
       return false
     }
@@ -143,12 +174,48 @@ function getCode() {
     countDown-- 
   }, 1000);
 
+  if (store.state.userInfo.email !== form.email) {
+    ElMessage({
+      showClose: true,
+      message: '该账号绑定的邮箱与输入的邮箱不符！',
+      type: 'error',
+      duration: 1500
+    })
+    if (timer) clearInterval(timer)
+    codeBtn.disabled = false
+    codeBtn.msg = "获取验证码"
+    return
+  }
 
-  ElMessage({
-    showClose: true,
-    message: '获取成功，请前往邮箱查看。',
-    type: 'success',
-  })
+  $API.user.getResetEmailCode({email: form.email})
+    .then(({data}) => {
+      // console.log(data)
+      if (data.code === 1000) {
+        ElMessage({
+          showClose: true,
+          message: '获取成功，请前往邮箱查看。',
+          type: 'success',
+          duration: 1500
+        })
+      } else {
+        console.log(data.msg)
+        ElMessage({
+          showClose: true,
+          message: data.msg,
+          type: 'error',
+          duration: 1500
+        })
+      }
+    })
+    .catch((err) => {
+      console.log('err', err)
+      ElMessage({
+        showClose: true,
+        message: '获取验证码失败。',
+        type: 'error',
+        duration: 1500
+      })
+    })
 }
 </script>
 
