@@ -47,3 +47,11 @@ export function resetPassword(data) {
         data
     })
 }
+
+export function setNickName(data) {
+    return request({
+        url: '/api/v1/user/setNickName',
+        method: 'post',
+        params: data
+    })
+}

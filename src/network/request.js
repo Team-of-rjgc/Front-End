@@ -10,7 +10,8 @@ export function request(config) {
         headers: {
             token: sessionStorage.getItem('token') || '',
             ...config.headers
-        }
+        },
+        withCredentials: true
     })
     return instance(config)
 }

@@ -183,7 +183,7 @@ let timer = null
 
 // 登录 图片验证码
 function getCodeImg() {
-  codeUrl.value = 'http://10.21.32.86:8080/api/v1/public/verifyCode' + '?'
+  codeUrl.value = 'http://10.21.32.86:8080/api/v1/public/verifyCode' + '?timestamp=' + new Date().getTime()
 }
 
 // 发送邮箱验证码
