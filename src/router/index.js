@@ -1,20 +1,19 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 
 // import MainContainer from '../components/MainContainer.vue'
-import HomePage from '../pages/HomePage.vue'
-import PostDetail from '../pages/post/PostDetail.vue'
-import Lost from '../pages/post/Lost.vue'
-import Found from '../pages/post/Found.vue'
-import EditPost from '../pages/post/EditPost.vue'
+import HomePage from '../pages/HomePage.vue';
+import PostDetail from '../pages/post/PostDetail.vue';
+import Lost from '../pages/post/Lost.vue';
+import Found from '../pages/post/Found.vue';
+import EditPost from '../pages/post/EditPost.vue';
+import FoundDetail from '../pages/post/FoundDetail.vue';
+import UserInfo from '../pages/user/UserInfo.vue';
+import UserHomePage from '../pages/user/UserHomePage.vue';
+import BasicInfo from '../pages/user/BasicInfo.vue';
+import ResetPassword from '../pages/user/ResetPassword.vue';
 
-import UserInfo from '../pages/user/UserInfo.vue'
-import UserHomePage from '../pages/user/UserHomePage.vue'
-import BasicInfo from '../pages/user/BasicInfo.vue'
-import ResetPassword from '../pages/user/ResetPassword.vue'
-
-import Inform from '../pages/Inform.vue'
-import SearchResult from '../pages/post/SearchResult.vue'
-
+import Inform from '../pages/Inform.vue';
+import SearchResult from '../pages/post/SearchResult.vue';
 
 const routes = [
   {
@@ -30,6 +29,12 @@ const routes = [
     path: '/PostDetail',
     name: 'PostDetail',
     component: PostDetail,
+  },
+  {
+    path: '/foundDetail/:postId',
+    name: 'foundDetail',
+    component: FoundDetail,
+    props: true, // 这使得 postId 可以作为 prop 传递到 FoundDetail 组件
   },
   {
     path: '/Lost',
@@ -52,8 +57,8 @@ const routes = [
     component: UserInfo,
     children: [
       { path: 'BasicInfo', component: BasicInfo },
-      { path: 'ResetPassword', component: ResetPassword }
-    ]
+      { path: 'ResetPassword', component: ResetPassword },
+    ],
   },
   {
     path: '/UserHomePage',
@@ -70,12 +75,12 @@ const routes = [
     name: 'SearchResult',
     component: SearchResult,
   },
-]
+];
 
 // 创建路由实例 并将路由记录传递给该实例的 routes 属性
 const router = createRouter({
   history: createWebHistory(),
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
