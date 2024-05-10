@@ -34,7 +34,7 @@ export function getVerifyCode() {
 
 export function login(data) {
     return request({
-        url: '/api/v1/public/register',
+        url: '/api/v1/public/login',
         method: 'post',
         data
     })

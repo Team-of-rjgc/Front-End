@@ -61,7 +61,7 @@
           <el-input v-model="register.pwd" placeholder="密码（6-16位的数字或字母）" type="password" show-password clearable class="input-box"></el-input>
         </el-form-item>
         <el-form-item prop="checkPwd">
-          <el-input v-model="register.checkPwd" placeholder="确认密码" type="password" show-password clearable class="input-box" @keyup.enter="toRegister(registerFormRef)"></el-input>
+          <el-input v-model="register.checkPwd" placeholder="确认密码" type="password" show-password clearable class="input-box" @keyup.enter="forgetPwd(registerFormRef)"></el-input>
         </el-form-item>
         <el-button type="primary" @click="forgetPwd(registerFormRef)" class="confirm-btn">确定</el-button>
       </el-form>
@@ -72,8 +72,10 @@
 
 <script setup>
 import { useStore } from "vuex"
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, watch, inject } from "vue";
 import { ArrowLeft } from '@element-plus/icons-vue'
+
+const $API = inject('$API')
 
 let loginDialog = ref(true)
 let forgetDialog = ref(false)
@@ -85,7 +87,8 @@ const store = useStore()
 
 let login = reactive({
   account: '',
-  pwd: ''
+  pwd: '',
+  code: 'lostfound'
 })
 let register = reactive({
   email: '',
@@ -181,16 +184,37 @@ function getCode() {
       countDown = 60
     }
     countDown-- 
-  }, 1000);
+  }, 1500);
 
-  
-
-
-  ElMessage({
-    showClose: true,
-    message: '获取成功，请前往邮箱查看。',
-    type: 'success',
-  })
+  $API.user.getRegisterEmailCode({email: register.email})
+    .then(({data}) => {
+      // console.log(data)
+      if (data.code === 1000) {
+        ElMessage({
+          showClose: true,
+          message: '获取成功，请前往邮箱查看。',
+          type: 'success',
+          duration: 1500
+        })
+      } else {
+        console.log(data.msg)
+        ElMessage({
+          showClose: true,
+          message: data.msg,
+          type: 'error',
+          duration: 1500
+        })
+      }
+    })
+    .catch((err) => {
+      console.log('err', err)
+      ElMessage({
+        showClose: true,
+        message: '获取验证码失败。',
+        type: 'error',
+        duration: 1500
+      })
+    })
 }
 
 function toLogin(formEl) {
@@ -198,19 +222,41 @@ function toLogin(formEl) {
   formEl.validate((valid) => {
     // 校验成功
     if (valid) {
-      
-      // 发请求
-
-      // ...
-
-      ElMessage({
-        showClose: true,
-        message: '登录成功！',
-        type: 'success',
-        duration: 800
+      $API.user.login({
+        email: login.account,
+        password: login.pwd,
+        code: login.code
       })
-      store.state.LoginRegisterVisible = false
-      store.state.isLogin = true
+        .then(({data}) => {
+          // console.log(data)
+          if (data.code === 1000) {
+            ElMessage({
+              showClose: true,
+              message: '登录成功！',
+              type: 'success',
+              duration: 1500
+            })
+            store.state.LoginRegisterVisible = false
+            store.state.isLogin = true
+          } else {
+            console.log(data.msg)
+            ElMessage({
+              showClose: true,
+              message: data.msg,
+              type: 'error',
+              duration: 1500
+            })
+          }
+        })
+        .catch((err) => {
+          console.log('err', err)
+          ElMessage({
+            showClose: true,
+            message: '登录失败！',
+            type: 'error',
+            duration: 1500
+          })
+        })
     } else {
       return false
     }
@@ -222,17 +268,30 @@ function toRegister(formEl) {
   formEl.validate((valid) => {
     // 校验成功
     if (valid) {
-      // 发请求
-
-      // ...
-
-      ElMessage({
-        showClose: true,
-        message: '注册成功！正在前往登录页...',
-        type: 'success',
-        duration: 800
+      $API.user.register({
+        email: register.email,
+        password: register.checkPwd,
+        code: register.veriCode
       })
-      loginDialog.value = true
+        .then((data) => {
+          // console.log(data)
+          ElMessage({
+            showClose: true,
+            message: '注册成功！正在前往登录页...',
+            type: 'success',
+            duration: 1500
+          })
+          loginDialog.value = true
+        })
+        .catch((err) => {
+          console.log('err', err)
+          ElMessage({
+            showClose: true,
+            message: '注册失败！',
+            type: 'error',
+            duration: 1500
+          })
+        })
     } else {
       return false
     }
