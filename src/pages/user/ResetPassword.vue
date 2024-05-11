@@ -126,30 +126,15 @@ function onSubmit (formEl) {
         .then(({data}) => {
           // console.log(data)
           if (data.code === 1000) {
-            ElMessage({
-              showClose: true,
-              message: '重置成功！',
-              type: 'success',
-              duration: 1500
-            })
+            showMessage('重置成功！', 'success')
           } else {
             console.log(data.msg)
-            ElMessage({
-              showClose: true,
-              message: data.msg,
-              type: 'error',
-              duration: 1500
-            })
+            showMessage(data.msg, 'error')
           }
         })
         .catch((err) => {
           console.log('err', err)
-          ElMessage({
-            showClose: true,
-            message: '重置失败！',
-            type: 'error',
-            duration: 1500
-          })
+          showMessage('重置失败！', 'error')
         })
     } else {
       return false
@@ -175,12 +160,7 @@ function getCode() {
   }, 1000);
 
   if (store.state.userInfo.email !== form.email) {
-    ElMessage({
-      showClose: true,
-      message: '该账号绑定的邮箱与输入的邮箱不符！',
-      type: 'error',
-      duration: 1500
-    })
+    showMessage('该账号绑定的邮箱与输入的邮箱不符！', 'error')
     if (timer) clearInterval(timer)
     codeBtn.disabled = false
     codeBtn.msg = "获取验证码"
@@ -191,30 +171,15 @@ function getCode() {
     .then(({data}) => {
       // console.log(data)
       if (data.code === 1000) {
-        ElMessage({
-          showClose: true,
-          message: '获取成功，请前往邮箱查看。',
-          type: 'success',
-          duration: 1500
-        })
+        showMessage('获取成功，请前往邮箱查看。', 'success')
       } else {
         console.log(data.msg)
-        ElMessage({
-          showClose: true,
-          message: data.msg,
-          type: 'error',
-          duration: 1500
-        })
+        showMessage(data.msg, 'error')
       }
     })
     .catch((err) => {
       console.log('err', err)
-      ElMessage({
-        showClose: true,
-        message: '获取验证码失败。',
-        type: 'error',
-        duration: 1500
-      })
+      showMessage('获取验证码失败。', 'error')
     })
 }
 </script>
