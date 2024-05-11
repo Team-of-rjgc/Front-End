@@ -47,8 +47,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-
+import { ref, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router'; // 添加这行
+const $API = inject('$API');
+const route = useRoute();
 const post = ref({
   title: '示例帖子标题',
   content: '这是帖子的详细内容，这里可以是一段长文。',
@@ -84,6 +86,29 @@ const submitComment = () => {
   // 清空输入
   newComment.value = '';
 };
+onMounted(async () => {
+  // Let's assume the fetchData function is where you make your API calls.
+  // const postData = await $API.post.postDetail(
+  //   route.params.postId, // 修改这里
+  // );
+  // const commentsData = await $API.post.commentDetail({
+  //   id: route.params.postId, // 修改这里
+  // });
+  // const comment = await $API.post.comment({
+  //   targetId: '5f228c9e183a43398db8f8e7ad730736',
+  //   content: '这是评论评论',
+  // });
+  const comment = await $API.post.setNickName({
+    nickName: '这是昵称',
+  });
+
+  post.value = {
+    title: postData.title,
+    content: postData.content,
+    imgUrls: postData.imgUrls,
+  };
+  comments.value = commentsData;
+});
 </script>
 
 <style scoped>
@@ -112,6 +137,6 @@ const submitComment = () => {
 }
 
 .comments-section .comment-input {
-  margin-bottom: .625rem;
+  margin-bottom: 0.625rem;
 }
 </style>
