@@ -212,6 +212,7 @@ import { ArrowLeft } from '@element-plus/icons-vue';
 import { onMounted } from 'vue';
 onMounted(getCodeImg);
 const $API = inject('$API');
+const $Tools = inject('$Tools');
 // vuex的store
 const store = useStore();
 
@@ -373,30 +374,15 @@ function getEmailCode(type) {
       .then(({ data }) => {
         // console.log(data)
         if (data.code === 1000) {
-          ElMessage({
-            showClose: true,
-            message: '获取成功，请前往邮箱查看。',
-            type: 'success',
-            duration: 1500,
-          });
+          showMessage('获取成功，请前往邮箱查看。','success')
         } else {
           console.log(data.msg);
-          ElMessage({
-            showClose: true,
-            message: data.msg,
-            type: 'error',
-            duration: 1500,
-          });
+          showMessage(data.msg, 'error')
         }
       })
       .catch((err) => {
         console.log('err', err);
-        ElMessage({
-          showClose: true,
-          message: '获取验证码失败。',
-          type: 'error',
-          duration: 1500,
-        });
+        showMessage('获取验证码失败。', 'error')
       });
   } else if (type === 'reset') {
     $API.user
@@ -404,30 +390,15 @@ function getEmailCode(type) {
       .then(({ data }) => {
         // console.log(data)
         if (data.code === 1000) {
-          ElMessage({
-            showClose: true,
-            message: '获取成功，请前往邮箱查看。',
-            type: 'success',
-            duration: 1500,
-          });
+          showMessage('获取成功，请前往邮箱查看。', 'success')
         } else {
           console.log(data.msg);
-          ElMessage({
-            showClose: true,
-            message: data.msg,
-            type: 'error',
-            duration: 1500,
-          });
+          showMessage(data.msg, 'error')
         }
       })
       .catch((err) => {
         console.log('err', err);
-        ElMessage({
-          showClose: true,
-          message: '获取验证码失败。',
-          type: 'error',
-          duration: 1500,
-        });
+        showMessage('获取验证码失败。', 'error')
       });
   }
 }
@@ -453,6 +424,7 @@ function getCode(type) {
 
   getEmailCode(type);
 }
+console.log($Tools)
 
 function toLogin(formEl) {
   if (!formEl) return;
@@ -468,12 +440,7 @@ function toLogin(formEl) {
         .then(({ data }) => {
           // console.log(data)
           if (data.code === 1000) {
-            ElMessage({
-              showClose: true,
-              message: '登录成功！',
-              type: 'success',
-              duration: 1500,
-            });
+            $Tools.showMessage('登录成功！', 'success', null, true)
             store.state.LoginRegisterVisible = false;
             store.state.isLogin = true;
             store.state.userInfo = data.data.user;
@@ -483,22 +450,12 @@ function toLogin(formEl) {
           } else {
             console.log(data.msg);
             getCodeImg(); // 重新获取验证码
-            ElMessage({
-              showClose: true,
-              message: data.msg,
-              type: 'error',
-              duration: 1500,
-            });
+            showMessage(data.msg, 'error')
           }
         })
         .catch((err) => {
           console.log('err', err);
-          ElMessage({
-            showClose: true,
-            message: '登录失败！',
-            type: 'error',
-            duration: 1500,
-          });
+          showMessage('登录失败！', 'error')
         });
     } else {
       return false;
@@ -520,31 +477,16 @@ function toRegister(formEl) {
         .then(({ data }) => {
           // console.log(data)
           if (data.code === 1000) {
-            ElMessage({
-              showClose: true,
-              message: '注册成功！正在前往登录页...',
-              type: 'success',
-              duration: 1500,
-            });
+            showMessage('注册成功！正在前往登录页...', 'success')
             loginDialog.value = true;
           } else {
             console.log(data.msg);
-            ElMessage({
-              showClose: true,
-              message: data.msg,
-              type: 'error',
-              duration: 1500,
-            });
+            showMessage(data.msg, 'error')
           }
         })
         .catch((err) => {
           console.log('err', err);
-          ElMessage({
-            showClose: true,
-            message: '注册失败！',
-            type: 'error',
-            duration: 1500,
-          });
+          showMessage('注册失败！', 'error')
         });
     } else {
       return false;
@@ -567,32 +509,17 @@ function forgetPwd(formEl) {
         .then(({ data }) => {
           // console.log(data)
           if (data.code === 1000) {
-            ElMessage({
-              showClose: true,
-              message: '重置成功！正在前往登录页...',
-              type: 'success',
-              duration: 1500,
-            });
+            showMessage('重置成功！正在前往登录页...', 'success')
             loginDialog.value = true;
             forgetDialog.value = false;
           } else {
             console.log(data.msg);
-            ElMessage({
-              showClose: true,
-              message: data.msg,
-              type: 'error',
-              duration: 1500,
-            });
+            showMessage(data.msg, 'error')
           }
         })
         .catch((err) => {
           console.log('err', err);
-          ElMessage({
-            showClose: true,
-            message: '重置失败！',
-            type: 'error',
-            duration: 1500,
-          });
+          showMessage('重置失败！', 'error')
         });
     } else {
       return false;

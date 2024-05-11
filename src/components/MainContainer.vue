@@ -39,7 +39,7 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item><router-link to="/UserInfo"><el-icon><User /></el-icon>个人信息</router-link></el-dropdown-item>
-                <el-dropdown-item><router-link to="/UserHomePage"><el-icon><House /></el-icon>我的主页</router-link></el-dropdown-item>
+                <!-- <el-dropdown-item><router-link to="/UserHomePage"><el-icon><House /></el-icon>我的主页</router-link></el-dropdown-item> -->
                 <el-dropdown-item divided @click="logOut"><el-icon><Switch /></el-icon>退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -61,16 +61,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, inject } from 'vue'
 import router from '../router'
 import { useStore } from "vuex"
 import { Search } from '@element-plus/icons-vue'
 import { Edit, Bell, User, House, Switch } from '@element-plus/icons-vue'
 import LoginOrRegister from '../pages/user/LoginOrRegister.vue'
 
+const $Tools = inject('$Tools')
 const store = useStore()
 
-const avatarUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png')
+const avatarUrl = ref()
 let searchInput = ref('')
 // 未读通知数量
 // let notificationNum = 2
@@ -88,19 +89,32 @@ function toEdit() {
 }
 
 function logOut() {
-
-  ElMessage({
-    showClose: true,
-    message: '退出登录成功！',
-    type: 'success',
-    duration: 800
-  })
+  $Tools.showMessage('退出登录成功！', 'success')
   store.state.isLogin = false
   store.state.userInfo = {}
   sessionStorage.clear()
   router.push('/Lost')
 }
 
+watch(
+  () => store.state.isLogin,
+  (val) => {
+    if (val) {
+      if (store.state.userInfo.icon) {
+        $Tools.downloadImg('upload_5096045757543304800.jpg')
+        .then(res => {
+          avatarUrl.value = res
+        })
+        .catch(err => {
+          console.log('err', err)
+          avatarUrl.value = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+        })
+      } else {
+        avatarUrl.value = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+      }
+    }
+  },
+);
 </script>
 
 <style>
