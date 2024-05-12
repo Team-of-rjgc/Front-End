@@ -69,9 +69,10 @@ import { Edit, Bell, User, House, Switch } from '@element-plus/icons-vue'
 import LoginOrRegister from '../pages/user/LoginOrRegister.vue'
 
 const $Tools = inject('$Tools')
+const $API = inject('$API')
 const store = useStore()
 
-const avatarUrl = ref()
+const avatarUrl = ref(store.state.avatar)
 let searchInput = ref('')
 // 未读通知数量
 // let notificationNum = 2
@@ -92,6 +93,7 @@ function logOut() {
   $Tools.showMessage('退出登录成功！', 'success')
   store.state.isLogin = false
   store.state.userInfo = {}
+  store.state.avatar = ''
   sessionStorage.clear()
   router.push('/Lost')
 }
@@ -104,13 +106,15 @@ watch(
         $Tools.downloadImg('upload_5096045757543304800.jpg')
         .then(res => {
           avatarUrl.value = res
+          store.state.avatar = res
         })
         .catch(err => {
           console.log('err', err)
-          avatarUrl.value = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+          store.state.value = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
         })
       } else {
-        avatarUrl.value = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+        // avatarUrl.value = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+        store.state.avatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
       }
     }
   },

@@ -355,10 +355,10 @@ function getCodeImg() {
     const blob = res.data;
     // 将响应数据转换成url对象 赋值给src变量 传递给img
     // that.src = windowUrl.createObjectURL(blob);
-    console.log(res);
-    console.log(blob);
+    // console.log(res);
+    // console.log(blob);
     codeUrl.value = window.URL.createObjectURL(blob);
-    console.log(codeUrl.value);
+    // console.log(codeUrl.value);
   });
   // codeUrl.value =
   //   'http://10.21.32.86:8080/api/v1/public/verifyCode' +
@@ -424,7 +424,6 @@ function getCode(type) {
 
   getEmailCode(type);
 }
-console.log($Tools)
 
 function toLogin(formEl) {
   if (!formEl) return;

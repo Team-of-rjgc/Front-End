@@ -15,11 +15,7 @@
 
       <el-form-item label="物品类型" prop="categoryName">
         <el-select v-model="post.categoryName" placeholder="请选择物品类型" class="input-box">
-          <el-option label="证件类" value="ceritificate" />
-          <el-option label="书籍类" value="book" />
-          <el-option label="电子产品" value="electronic" />
-          <el-option label="生活用品" value="daily" />
-          <el-option label="其他" value="others" />
+          <el-option :label="item" :value="item" v-for="item in allCategory" />
         </el-select>
       </el-form-item>
 
@@ -58,10 +54,15 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, inject } from "vue";
 import { Plus } from '@element-plus/icons-vue'
 
+const $API = inject('$API')
+const $Tools = inject('$Tools')
+
 const postFormRef = ref()
+
+let allCategory = reactive([])
 
 let post = reactive({
   title: '',
@@ -70,7 +71,7 @@ let post = reactive({
   categoryName: '',
   location: '',
   // contact: '',
-  applyKind: '',
+  applyKind: '', // 0:失物发布 1:认领发布
 })
 
 const fileList = ref([])
@@ -104,6 +105,23 @@ const postRules = reactive({
   }],
 })
 
+// 获取物品分类列表
+$API.post.getCategory()
+  .then(({data}) => {
+    if (data.code === 1000) {
+      data.data.list.forEach(ele => {
+        allCategory.push(ele.name)
+      })
+    } else {
+      console.log(data.msg);
+      $Tools.showMessage(data.msg, 'error')
+    }
+  })
+  .catch(err => {
+    console.log('err', err)
+    $Tools.showMessage('获取物品分类列表失败！', 'error')
+  })
+
 function sendPost(formEl) {
   if (!formEl) return
   formEl.validate((valid) => {
@@ -115,36 +133,28 @@ function sendPost(formEl) {
           getFile(ele)
         })
       }
-      console.log(post.images)
+      console.log('--', post)
       
-      // 发请求
-
-        // .then(({data}) => {
-        //   if (data.code === 200) {
-        //     ElMessage({
-        //       showClose: true,
-        //       message: "发布成功！",
-        //       type: 'success',
-        //       duration: 900
-        //     })
-        //   } else {
-        //     ElMessage({
-        //       showClose: true,
-        //       message: data.message,
-        //       type: 'error',
-        //       duration: 900
-        //     })
-        //   }
-        // })
-        // .catch((err) => {
-        //   console.log('err', err)
-        //   ElMessage({
-        //     showClose: true,
-        //     message: '发布失败！',
-        //     type: 'error',
-        //     duration: 900
-        //   })
-        // })
+      $API.post.publish({
+        applyKind: post.applyKind,
+        categoryName: post.categoryName,
+        title: post.title,
+        about: post.about,
+        images: post.images,
+        location: post.location
+      })
+        .then(({data}) => {
+          if (data.code === 1000) {
+            console.log('data', data.data)
+          } else {
+            console.log(data.msg);
+            $Tools.showMessage(data.msg, 'error')
+          }
+        })
+        .catch(err => {
+          console.log('err', err)
+          $Tools.showMessage('发布文章失败！', 'error')
+        })
       
     } else {
       return false
@@ -164,7 +174,7 @@ function handlePictureCardPreview (uploadFile) {
 // 将图片文件转成base64格式
 function getFile(file) {
   getBase64(file.raw).then(res => {
-    console.log(res)
+    // console.log(res)
     post.images.push(res)
   })
 }
