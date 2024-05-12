@@ -31,7 +31,7 @@ const routes = [
     component: PostDetail,
   },
   {
-    path: '/foundDetail/:postId',
+    path: '/foundDetail',
     name: 'foundDetail',
     component: FoundDetail,
     props: true, // 这使得 postId 可以作为 prop 传递到 FoundDetail 组件
@@ -84,11 +84,11 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    if (to.fullPath === '/UserInfo') {
-      next('/UserInfo/BasicInfo')
-    } else {
-      next()
-    }
-})
+  if (to.fullPath === '/UserInfo') {
+    next('/UserInfo/BasicInfo');
+  } else {
+    next();
+  }
+});
 
-export default router
+export default router;

@@ -19,8 +19,10 @@
         </el-table-column>
         <el-table-column prop="author" label="作者">
           <template v-slot="scope">
-            <span class="author">{{ scope.row.realName }}</span>
-            <el-avatar :src="iconUrl"></el-avatar>
+            <div style="display: flex; align-items: center">
+              <el-avatar :src="scope.row.iconUrl"></el-avatar>
+              <span class="author">{{ scope.row.realName }}</span>
+            </div>
           </template>
         </el-table-column>
         <el-table-column prop="time" label="时间"></el-table-column>
@@ -92,8 +94,11 @@ onMounted(async () => {
   console.log(postList);
 }); // 这里'/api/posts'应该是你的后端接口地址postList = reactive(response.data); // 使用接口返回的数据totalPosts.value = postList.length;});
 
+// let goToPostDetail = (post) => {
+//   router.push({ name: 'foundDetail', params: { postId: post.id } });
+// };
 let goToPostDetail = (post) => {
-  router.push({ name: 'foundDetail', params: { postId: post.id } });
+  router.push({ name: 'foundDetail', query: { id: post.id } });
 };
 </script>
 

@@ -10,28 +10,20 @@ export function postPage(data) {
 //帖子详情
 export function postDetail(params) {
   return request({
-    url: `/api/v1/user/detail?id=${params}`,
+    url: `/api/v1/user/detail`,
     method: 'post',
-    // params: JSON.string(params),
-    // params: params,
+    params: params,
   });
 }
 //帖子评论详情
 export function commentDetail(params) {
   return request({
-    url: `/api/v1/user/commentDetail`,
+    url: `/api/v1/user/comments`,
     method: 'post',
     params: params,
   });
 }
 
-// // 图片验证码
-// export function getVerifyCode() {
-//   return request({
-//     url: '/api/v1/public/verifyCode',
-//     method: 'get',
-//   });
-// }
 //发布评论
 export function comment(data) {
   return request({
@@ -54,5 +46,12 @@ export function setNickName(params) {
     url: '/api/v1/user/setNickName',
     method: 'post',
     params,
+  });
+}
+//获取与我相关的评论
+export function messages() {
+  return request({
+    url: '/api/v1/user/messages',
+    method: 'post',
   });
 }

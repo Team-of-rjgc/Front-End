@@ -1,19 +1,28 @@
 <template>
   <div class="bg">
-    <el-container style="height: 500px;">
+    <el-container style="height: 500px">
       <!-- 侧边栏 -->
       <el-aside width="200px">
         <el-scrollbar>
           <el-menu>
             <el-menu-item-group>
               <el-menu-item index="1-1">
-                <router-link to="/UserInfo/BasicInfo" class="link" active-class="active" ref="intro">
+                <router-link
+                  to="/UserInfo/BasicInfo"
+                  class="link"
+                  active-class="active"
+                  ref="intro"
+                >
                   <el-icon><InfoFilled /></el-icon>
                   基本信息
                 </router-link>
               </el-menu-item>
               <el-menu-item index="1-2">
-                <router-link to="/UserInfo/ResetPassword" class="link" active-class="active">
+                <router-link
+                  to="/UserInfo/ResetPassword"
+                  class="link"
+                  active-class="active"
+                >
                   <el-icon><Tools /></el-icon>
                   重置密码
                 </router-link>
@@ -33,14 +42,14 @@
 </template>
 
 <script setup>
-import { InfoFilled, Tools } from '@element-plus/icons-vue'
-import router from '../../router'
-import { useStore } from "vuex"
-const store = useStore()
+import { InfoFilled, Tools } from '@element-plus/icons-vue';
+import router from '../../router';
+import { useStore } from 'vuex';
+const store = useStore();
 
 if (!store.state.isLogin) {
-  router.push('/Lost')
-  store.state.LoginRegisterVisible = true
+  router.push('/Lost');
+  store.state.LoginRegisterVisible = true;
 }
 </script>
 
@@ -68,8 +77,8 @@ aside {
   border-right: 1px solid rgb(220, 223, 230);
 }
 
-.el-menu .active  {
+.el-menu .active {
   border-left: 4px solid rgb(220, 223, 230);
-  transition: all .2s;
+  transition: all 0.2s;
 }
 </style>
