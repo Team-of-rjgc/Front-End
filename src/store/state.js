@@ -5,5 +5,6 @@ export default {
     // 组件key 用于刷新
     LoginRegisterKey: 0,
     // 已登录用户的信息
-    userInfo: {}
+    userInfo: {},
+    avatar: '',
 }

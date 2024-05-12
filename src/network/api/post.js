@@ -55,3 +55,18 @@ export function messages() {
     method: 'post',
   });
 }
+// 发布帖子
+export function publish(data) {
+  return request({
+    url: '/api/v1/user/pub',
+    method: 'post',
+    data,
+  });
+}
+// 获取物品类别列表
+export function getCategory() {
+  return request({
+    url: '/api/v1/common/category',
+    method: 'post',
+  });
+}

@@ -39,16 +39,26 @@
 </template>
 
 <script setup lang='ts'>
-import { reactive, ref } from 'vue'
+import { reactive, ref, inject } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import router from '../../router'
 import { useStore } from "vuex"
 const store = useStore()
+const $API = inject('$API');
 
 if (!store.state.isLogin) {
   router.push('/Lost')
   store.state.LoginRegisterVisible = true
 }
+
+  // $API.user.setNickName({nickName: '崩溃了烙铁'})
+  // .then(({data}) => {
+  //   console.log('data', data)
+  // })
+  // .catch(err => {
+  //   console.log('err', err)
+  // })
+
 
 // 获取表单DOM元素
 const uploadForm = ref()
