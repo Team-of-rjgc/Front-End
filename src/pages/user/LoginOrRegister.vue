@@ -210,7 +210,7 @@ import { useStore } from 'vuex';
 import { reactive, ref, watch, inject } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { onMounted } from 'vue';
-onMounted(getCodeImg);
+
 const $API = inject('$API');
 const $Tools = inject('$Tools');
 // vuex的store
@@ -564,6 +564,17 @@ watch(
     codeBtn.disabled = false;
     codeBtn.msg = '获取验证码';
   },
+);
+
+watch(
+  () => store.state.LoginRegisterVisible,
+  (val) => {
+    // 获取随机验证码
+    if (val) {
+      if (loginDialog.value) getCodeImg()
+    }
+  },
+  { immediate: true }
 );
 </script>
 

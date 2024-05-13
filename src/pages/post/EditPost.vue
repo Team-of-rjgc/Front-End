@@ -34,8 +34,11 @@
           list-type="picture-card"
           :on-preview="handlePictureCardPreview"
           :on-remove="handleRemove"
+          :on-change="handleChange"
           accept=".jpg, .png"
           :auto-upload="false"
+          :limit="3"
+          :class="{hide: hideUploadEdit}"
         >
           <el-icon><Plus /></el-icon>
         </el-upload>
@@ -48,7 +51,7 @@
       <el-form-item prop="about" label="详情">
         <el-input v-model="post.about" placeholder="物品描述" clearable class="input-box" type="textarea"></el-input>
       </el-form-item>
-    <el-button type="primary" @click="sendPost(postFormRef)" class="confirm-btn">确定</el-button>
+    <el-button type="primary" @click="sendPost(postFormRef)" class="confirm-btn" :disabled="submitBtn.disabled">{{ submitBtn.msg }}</el-button>
     </el-form>
   </div>
 </template>
@@ -56,6 +59,7 @@
 <script setup>
 import { reactive, ref, inject } from "vue";
 import { Plus } from '@element-plus/icons-vue'
+import router from "../../router";
 
 const $API = inject('$API')
 const $Tools = inject('$Tools')
@@ -77,6 +81,12 @@ let post = reactive({
 const fileList = ref([])
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
+
+let submitBtn = reactive({
+  disabled: false,
+  msg: '提交'
+})
+let hideUploadEdit = ref(false)
 
 const postRules = reactive({
   title: [{ validator: (rule, value, callback) => {
@@ -122,44 +132,64 @@ $API.post.getCategory()
     $Tools.showMessage('获取物品分类列表失败！', 'error')
   })
 
-function sendPost(formEl) {
+async function sendPost(formEl) {
   if (!formEl) return
   formEl.validate((valid) => {
     // 校验成功
     if (valid) {
       // 处理图片 转成base64格式
       if (fileList.value.length) {
-        fileList.value.forEach(ele => {
-          getFile(ele)
-        })
+        let promiseArr = []
+        fileList.value.forEach((file) => {
+          promiseArr.push(getBase64(file.raw))
+        });
+        // 等所有promise执行完毕后再发请求
+        Promise.all(promiseArr)
+          .then(res => {
+            // res:所有promise resolve后的结果数组
+            post.images = res
+            sendPublishRequest()
+          })
+          .catch(err => {
+            console.log('err', err)
+            $Tools.showMessage('图片处理失败！', 'error', 2000)
+            fileList.value = []
+            post.images = []
+          })
+      } else {
+        sendPublishRequest()
       }
-      console.log('--', post)
-      
-      $API.post.publish({
-        applyKind: post.applyKind,
-        categoryName: post.categoryName,
-        title: post.title,
-        about: post.about,
-        images: post.images,
-        location: post.location
-      })
-        .then(({data}) => {
-          if (data.code === 1000) {
-            console.log('data', data.data)
-          } else {
-            console.log(data.msg);
-            $Tools.showMessage(data.msg, 'error')
-          }
-        })
-        .catch(err => {
-          console.log('err', err)
-          $Tools.showMessage('发布文章失败！', 'error')
-        })
-      
     } else {
       return false
     }
   })
+}
+
+function sendPublishRequest() {
+  submitBtn.msg = '正在发布...'
+  submitBtn.disabled = true
+  $API.post.publish({
+    applyKind: post.applyKind,
+    categoryName: post.categoryName,
+    title: post.title,
+    about: post.about,
+    images: post.images,
+    location: post.location
+  })
+    .then(({data}) => {
+      if (data.code === 1000) {
+        $Tools.showMessage('发布成功！', 'success')
+        if (post.applyKind === 1) router.push('/Found')
+        else router.push('/Lost')
+      } else {
+        console.log(data.msg);
+        $Tools.showMessage(data.msg, 'error')
+      }
+    })
+    .catch(err => {
+      console.log('err', err)
+      $Tools.showMessage('发布文章失败！', 'error')
+    })
 }
 
 function handleRemove (uploadFile, uploadFiles) {
@@ -171,20 +201,17 @@ function handlePictureCardPreview (uploadFile) {
   dialogVisible.value = true
 }
 
-// 将图片文件转成base64格式
-function getFile(file) {
-  getBase64(file.raw).then(res => {
-    // console.log(res)
-    post.images.push(res)
-  })
+function handleChange() {
+//  fileList.value.length是实际长度-1
+  hideUploadEdit.value = fileList.value.length == 2 ? true : false
 }
 
 // 转换过程（“FileReader不能return 所以用promise封装”）
-function getBase64(file) {
+function getBase64(raw) {
   return new Promise(function (resolve, reject) {
     const reader = new FileReader()
     let imgResult = ''
-    reader.readAsDataURL(file)
+    reader.readAsDataURL(raw)
     reader.onload = function () {
       imgResult = reader.result
     }
@@ -243,5 +270,10 @@ function getBase64(file) {
 
 .item-img .el-form-item__label {
   margin-right: 20px;
+}
+
+/* 隐藏上传按钮 */
+.hide .el-upload--picture-card {
+  display: none;
 }
 </style>

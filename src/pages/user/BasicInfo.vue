@@ -6,11 +6,11 @@
           <el-form :model="form" ref="uploadForm" style="width: 400px;">
             <el-form-item label="头像：" ref="uploadEle">
               <el-upload class="avatar-uploader"
+                action="#"
+                :auto-upload="false"
                 :show-file-list="false"
-                :before-upload="handleUpload"
-                :on-success="handleAvatarSuccess"
-                :headers="avatarHeader"
-                action="/api/user/upload/avatar"
+                accept=".jpg, .jpeg, .png"
+                :on-change="uploadAvatar"
                 >
                 <img v-if="form.imageUrl" :src="form.imageUrl" class="avatar" prop="imgUrl" />
                 <el-icon v-else class="avatar-uploader-icon">
@@ -44,21 +44,13 @@ import { Plus } from '@element-plus/icons-vue'
 import router from '../../router'
 import { useStore } from "vuex"
 const store = useStore()
-const $API = inject('$API');
+const $API = inject('$API')
+const $Tools = inject('$Tools')
 
 if (!store.state.isLogin) {
   router.push('/Lost')
   store.state.LoginRegisterVisible = true
 }
-
-  // $API.user.setNickName({nickName: '崩溃了烙铁'})
-  // .then(({data}) => {
-  //   console.log('data', data)
-  // })
-  // .catch(err => {
-  //   console.log('err', err)
-  // })
-
 
 // 获取表单DOM元素
 const uploadForm = ref()
@@ -76,38 +68,33 @@ let info = reactive({
 
 let newName = ref(info.name)
 
-const avatarHeader = reactive({
-  Authorization: window.sessionStorage.getItem('token')
-})
-
-// 头像上传相关
-const handleAvatarSuccess = (response, uploadFile) => {
-  if (response.code === 200) {
-    form.imageUrl = response.data
-    // // 更新本地存的信息
-    // const obj = JSON.parse(sessionStorage.getItem('userInfo'))
-    // obj.avatar = response.data
-    // sessionStorage.setItem('userInfo', JSON.stringify(obj))
-  } else {
-    // ElMessage({
-    //   showClose: true,
-    //   message: response.msg,
-    //   type: 'error',
-    //   duration: 800
-    // })
-  }
+// 读取用户信息
+if (JSON.stringify(store.state.userInfo) !== '{}') {
+  newName.value = store.state.userInfo.nickName
+  info.name = store.state.userInfo.nickName
+  info.email = store.state.userInfo.email
+  form.imageUrl = store.state.avatar
 }
 
-// 运行效果上传
-const handleUpload = (uploadFile) => {
-  if (uploadFile.type !== 'image/jpeg' && uploadFile.type !== 'image/png') {
-    Message('error', '头像格式必须是JPG/JPEG/PNG格式！')
-    return false
-  } else if (uploadFile.size / 1024 / 1024 > 4) {
-    Message('error', '头像大小不能超过4MB！')
-    return false
-  }
-  return true
+function uploadAvatar(file) {
+  console.log(file);
+  const fd = new FormData()
+  fd.append('image', file.raw)
+  $API.user.setIcon(fd)
+    .then(({data}) => {
+      if (data.code === 1000) {
+        form.imageUrl = URL.createObjectURL(file.raw)
+        store.state.avatar = form.imageUrl
+        $Tools.showMessage('上传成功', 'success')
+      } else {
+        console.log(data.msg);
+        $Tools.showMessage(data.msg, 'error')
+      }
+    })
+    .catch(err => {
+      console.log('err', err)
+      $Tools.showMessage('上传头像失败！', 'error')
+    })
 }
 
 // 验证修改的用户名+修改用户名
@@ -119,41 +106,26 @@ function checkEdit () {
   } else if(newName.value === info.name) {
     info.isEdit = !info.isEdit
   } else if (reg.test(newName.value)) {
-    // $api.user.updateUsername({ username: newName.value })
-    //   .then((res: AxiosResponse) => {
-    //     // console.log(res)
-    //     if (res.data.code === 200) {
-    //       successMsg.value.$el.click()
+    $API.user.setNickName({nickName: newName.value})
+      .then(({data}) => {
+        if (data.code === 1000) {
+          store.state.userInfo.nickName = newName.value
           info.name = newName.value
-    //       // 更新本地存的信息
-    //       const obj = JSON.parse(sessionStorage.getItem('userInfo')!)
-    //       obj.username = newName.value
-    //       sessionStorage.setItem('userInfo', JSON.stringify(obj))
-    //     } else {
-    //       // 修改提示文字内容
-    //       warningText = res.data.msg
-    //       warningMsg.value.$el.click()
-    //     }
-    //   })
-    //   .catch((err: AxiosError) => {
-    //     warningText = '请求出错'
-    //     warningMsg.value.$el.click()
-    //     console.log(err.message)
-    //   })
+        } else {
+          console.log(data.msg);
+          $Tools.showMessage(data.msg, 'error', 1500)
+        }
+      })
+      .catch(err => {
+        console.log('err', err)
+      })
     info.isEdit = !info.isEdit
   } else {
     showMessage('用户名必须为6-16位任意字符！','error')
   }
 }
 
-// 读取用户信息
-// if (sessionStorage.getItem('userInfo') !== null) {
-//   const obj = JSON.parse(sessionStorage.getItem('userInfo')!)
-//   newName.value = obj.username
-//   info.name = obj.username
-//   info.email = obj.email
-//   form.imageUrl = obj.avatar
-// }
+
 </script>
 
 <style scoped>

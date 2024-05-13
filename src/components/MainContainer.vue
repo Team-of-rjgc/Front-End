@@ -72,6 +72,9 @@ const $Tools = inject('$Tools')
 const $API = inject('$API')
 const store = useStore()
 
+// 刷新后登录页关闭
+store.state.LoginRegisterVisible = false
+
 const avatarUrl = ref(store.state.avatar)
 let searchInput = ref('')
 // 未读通知数量
@@ -113,12 +116,19 @@ watch(
           store.state.value = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
         })
       } else {
-        // avatarUrl.value = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+        avatarUrl.value = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
         store.state.avatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
       }
     }
   },
 );
+
+watch(
+  () => store.state.avatar,
+  (val) => {
+    avatarUrl.value = val
+  }
+)
 </script>
 
 <style>

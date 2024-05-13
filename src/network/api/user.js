@@ -56,3 +56,11 @@ export function setNickName(data) {
     params: data,
   });
 }
+
+export function setIcon(data) {
+  return request({
+    url: '/api/v1/user/setIcon',
+    method: 'post',
+    data,
+  });
+}
