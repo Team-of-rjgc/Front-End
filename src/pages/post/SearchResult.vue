@@ -1,53 +1,120 @@
 <template>
   <div class="bg">
-    <div class="all-post" v-if="!ifEmpty">
-      <li class="post-box" v-for="post in postList">
-        <div class="post-left-part">
-          <div class="post-main">
-            <h3 class="post-title">{{ post.title }}</h3>
-            <span class="post-content">{{ post.content }}</span>
-          </div>
-          <div class="info">
-            <span class="author">{{ post.author }}</span>
-            <span class="time">{{ post.time }}</span>
-          </div>
-        </div>
-        <div class="post-right-part">
-          <img class="post-img" v-if="post.imgUrl" :src="post.imgUrl">
-        </div>
-      </li>
+    <div v-if="!ifEmpty">
+      <el-table
+        :data="postList"
+        style="width: 100%"
+        @row-click="goToPostDetail"
+      >
+        <el-table-column prop="title" label="标题"></el-table-column>
+        <el-table-column prop="content" label="内容"></el-table-column>
+        <el-table-column label="图片">
+          <template v-slot="scope">
+            <el-image
+              fit="cover"
+              style="width: 100px; height: 100px"
+              :src="scope.row.imgUrl"
+            ></el-image>
+          </template>
+        </el-table-column>
+        <el-table-column prop="author" label="作者">
+          <template v-slot="scope">
+            <div style="display: flex; align-items: center">
+              <el-avatar :src="scope.row.iconUrl"></el-avatar>
+              <span class="author">{{ scope.row.realName }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="time" label="时间"></el-table-column>
+      </el-table>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page.sync="currentPage"
+        :page-sizes="[10, 20, 50]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="totalPosts"
+      />
     </div>
-    
     <div class="justify-align-center" v-else>
-      <el-empty description="暂无搜索结果" />
+      <el-empty description="暂无帖子" />
     </div>
   </div>
-
   <el-backtop :right="100" :bottom="100" />
 </template>
-
 <script setup>
-import { reactive } from 'vue';
+import { reactive, computed, ref, onMounted, inject } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+const $API = inject('$API');
+const route = useRoute();
+const router = useRouter();
+console.log(route.query.keyword);
+let searchKeyword = ref(''); // 定义搜索关键词
+let fit = ref('fill');
+let pageSize = ref(10);
+let currentPage = ref(1);
+let totalPosts = ref(0);
+let postList = reactive([]);
+totalPosts.value = postList.length;
 
-// 是否有帖子
-let ifEmpty = false
+const paginatedPostList = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return postList.slice(start, end);
+});
 
-let postList = reactive([
-  {
-    title: '123',
-    content: '丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱',
-    author: '作者名作者名作者名作者名作者名',
-    time: '2024-5-6 00:00',
-    imgUrl: 'https://img2.imgtp.com/2024/05/06/5NfmuCD7.jpg'
-  },
-  {
-    title: '2345',
-    content: '丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱丢了100块钱',
-    author: '作者名不知道',
-    time: '2024-5-6 00:00',
-    imgUrl: 'https://img2.imgtp.com/2024/05/06/v3FUgkBW.png'
-  },
-])
+const ifEmpty = computed(() => {
+  return postList.length === 0;
+}); // 新增了ifEmpty变量
+
+const fetchPosts = async () => {
+  try {
+    const res = await $API.post.postPage({
+      kind: 1,
+      category: '',
+      keyword: searchKeyword.value, // 使用搜索关键词作为查询参数
+      username: '',
+      pageNum: currentPage.value - 1, // 注意这里需要将页码传递给API
+      pageSize: pageSize.value, // 和页数大小
+    });
+    console.log(res.data.data.page.list);
+    totalPosts.value = res.data.data.page.total; // 设置总帖子数的值
+
+    const newPostList = res.data.data.page.list.map((post) => ({
+      ...post,
+      content: post.about, // 使用 about 属性作为帖子的内容
+      imgUrl: `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${post.images[0]}`, // 使用 images 数组的第一个 URL 作为帖子图片的 URL
+      iconUrl: `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${post.icon}`,
+    }));
+
+    postList.splice(0, postList.length, ...newPostList); // 替换当前的帖子列表
+  } catch (error) {
+    console.error('获取帖子列表时发生错误:', error);
+  }
+};
+onMounted(async () => {
+  const keyWord = route.query.keyword || ''; // 使用查询参数获取postId
+  searchKeyword.value = keyWord; // 从查询参数获取搜索关键词
+  console.log('searchresult页面mounted');
+  fetchPosts();
+}); // 这里'/api/posts'应该是你的后端接口地址postList = reactive(response.data); // 使用接口返回的数据totalPosts.value = postList.length;});
+const handleSizeChange = async (newSize) => {
+  pageSize.value = newSize;
+  currentPage.value = 1; // 修改页数大小后应返回到第一页
+  await fetchPosts();
+};
+
+const handleCurrentChange = async (newCurrent) => {
+  currentPage.value = newCurrent;
+  await fetchPosts();
+};
+// let goToPostDetail = (post) => {
+//   router.push({ name: 'foundDetail', params: { postId: post.id } });
+// };
+let goToPostDetail = (post) => {
+  router.push({ name: 'foundDetail', query: { id: post.id } });
+};
 </script>
 
 <style>
@@ -58,19 +125,17 @@ let postList = reactive([
 .post-box {
   display: flex;
   justify-content: space-between;
-
   padding: 10px 20px;
   height: 120px;
-  border-bottom: 1px solid rgba(0, 0, 0, .1);
-
-  transition: all .2s;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
 }
 
 .post-box:hover {
   background-color: var(--el-color-primary-light-9);
   cursor: pointer;
 
-  transition: all .2s;
+  transition: all 0.2s;
 }
 
 .post-left-part {
@@ -115,7 +180,7 @@ let postList = reactive([
   width: 120px;
 
   overflow: hidden;
-  text-overflow:ellipsis;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -123,7 +188,7 @@ let postList = reactive([
   margin-left: 15px;
 
   overflow: hidden;
-  text-overflow:ellipsis;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 </style>

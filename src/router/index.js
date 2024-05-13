@@ -74,6 +74,7 @@ const routes = [
     path: '/SearchResult',
     name: 'SearchResult',
     component: SearchResult,
+    props: true, // 这使得 postId 可以作为 prop 传递到 FoundDetail 组件
   },
 ];
 
