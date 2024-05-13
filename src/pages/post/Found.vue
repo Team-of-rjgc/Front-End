@@ -66,34 +66,44 @@ const ifEmpty = computed(() => {
   return postList.length === 0;
 }); // 新增了ifEmpty变量
 
-const handleSizeChange = (newSize) => {
-  pageSize.value = newSize;
-  currentPage.value = 1; // 切换每页数量
-};
-onMounted(async () => {
-  const res = await $API.post.postPage({
-    kind: 1,
-    category: '',
-    keyword: '',
-    username: '',
-    pageNum: 0,
-    pageSize: 10,
-  });
-  console.log(res.data.data.page.list);
-  totalPosts.value = res.data.data.page.total; // 设置总页数的值
-  const newPostList = res.data.data.page.list.map((post) => {
-    return {
+const fetchPosts = async () => {
+  try {
+    const res = await $API.post.postPage({
+      kind: 1,
+      category: '',
+      keyword: '',
+      username: '',
+      pageNum: currentPage.value-1, // 注意这里需要将页码传递给API
+      pageSize: pageSize.value, // 和页数大小
+    });
+    console.log(res.data.data.page.list);
+    totalPosts.value = res.data.data.page.total; // 设置总帖子数的值
+
+    const newPostList = res.data.data.page.list.map((post) => ({
       ...post,
       content: post.about, // 使用 about 属性作为帖子的内容
       imgUrl: `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${post.images[0]}`, // 使用 images 数组的第一个 URL 作为帖子图片的 URL
       iconUrl: `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${post.icon}`,
-    };
-  });
-  postList.length = 0;
-  postList.push(...newPostList);
-  console.log(postList);
-}); // 这里'/api/posts'应该是你的后端接口地址postList = reactive(response.data); // 使用接口返回的数据totalPosts.value = postList.length;});
+    }));
 
+    postList.splice(0, postList.length, ...newPostList); // 替换当前的帖子列表
+  } catch (error) {
+    console.error('获取帖子列表时发生错误:', error);
+  }
+};
+onMounted(async () => {
+  fetchPosts();
+}); // 这里'/api/posts'应该是你的后端接口地址postList = reactive(response.data); // 使用接口返回的数据totalPosts.value = postList.length;});
+const handleSizeChange = async (newSize) => {
+  pageSize.value = newSize;
+  currentPage.value = 1; // 修改页数大小后应返回到第一页
+  await fetchPosts();
+};
+
+const handleCurrentChange = async (newCurrent) => {
+  currentPage.value = newCurrent;
+  await fetchPosts();
+};
 // let goToPostDetail = (post) => {
 //   router.push({ name: 'foundDetail', params: { postId: post.id } });
 // };

@@ -70,3 +70,11 @@ export function getCategory() {
     method: 'post',
   });
 }
+//删除评论
+export function removeComment(data) {
+  return request({
+    url: '/api/v1/user/removeComment',
+    method: 'post',
+    data,
+  });
+}
