@@ -22,9 +22,9 @@
           @keyup.enter="toSearch"
         >
           <template #prepend>
-            <el-dropdown trigger="click" @command="handleTypeChange">
+            <el-dropdown trigger="hover" @command="handleTypeChange">
               <span class="el-dropdown-link">
-                <el-icon :size="16" v-if="searchType != 0 && searchType != 1" style="width: 55px;"><Search /></el-icon>
+                <el-icon :size="16" v-if="searchType != 0 && searchType != 1" class="search-icon"><Search /></el-icon>
                 <span v-if="searchType == 0">寻物启示</span>
                 <span v-if="searchType == 1">失物招领</span>
                 <el-icon class="el-icon--right"><arrow-down /></el-icon>
@@ -326,5 +326,14 @@ watch(
 
 .el-input-group__prepend {
   width: 90px;
+}
+
+.el-dropdown .el-dropdown-link {
+  outline: none;
+  cursor: pointer;
+}
+
+.search-icon {
+  width: 55px;
 }
 </style>
