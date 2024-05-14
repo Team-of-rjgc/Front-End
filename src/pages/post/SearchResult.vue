@@ -61,6 +61,7 @@ const store = useStore();
 
 // console.log(route.query.keyword);
 let searchKeyword = ref(''); // 定义搜索关键词
+let searchType = ref(''); // 定义类型
 let fit = ref('fill');
 let pageSize = ref(10);
 let currentPage = ref(1);
@@ -81,7 +82,7 @@ const ifEmpty = computed(() => {
 const fetchPosts = async () => {
   try {
     const res = await $API.post.postPage({
-      kind: 1,
+      kind: searchType.value,
       category: '',
       keyword: searchKeyword.value, // 使用搜索关键词作为查询参数
       username: '',
@@ -105,8 +106,10 @@ const fetchPosts = async () => {
 };
 onMounted(async () => {
   const keyWord = route.query.keyword || ''; // 使用查询参数获取postId
+  const type = route.query.type || ''; // 使用查询参数获取postId
   searchKeyword.value = keyWord; // 从查询参数获取搜索关键词
-  console.log('searchresult页面mounted');
+  searchType.value = type; // 从查询参数获取搜索关键词
+  // console.log('searchresult页面mounted');
   fetchPosts();
 }); // 这里'/api/posts'应该是你的后端接口地址postList = reactive(response.data); // 使用接口返回的数据totalPosts.value = postList.length;});
 const handleSizeChange = async (newSize) => {
