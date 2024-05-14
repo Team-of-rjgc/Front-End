@@ -22,7 +22,20 @@
           @keyup.enter="toSearch"
         >
           <template #prepend>
-            <el-icon :size="16"><Search /></el-icon>
+            <el-dropdown trigger="click" @command="handleTypeChange">
+              <span class="el-dropdown-link">
+                <el-icon :size="16" v-if="searchType != 0 && searchType != 1" style="width: 55px;"><Search /></el-icon>
+                <span v-if="searchType == 0">寻物启示</span>
+                <span v-if="searchType == 1">失物招领</span>
+                <el-icon class="el-icon--right"><arrow-down /></el-icon>
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item :command="0">寻物启示</el-dropdown-item>
+                  <el-dropdown-item :command="1">失物招领</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
           <template #append>
             <el-button @click="toSearch" class="search-btn">搜索</el-button>
@@ -41,7 +54,6 @@
           active-class="active"
           v-if="$store.state.isLogin"
         >
-          <!-- <el-badge :value="notificationNum" :max="10" class="notification-icon" type="primary"><el-icon class="icon"><Bell /></el-icon>通知</el-badge> -->
           <div class="flex-btn">
             <el-icon class="icon"><Bell /></el-icon>通知
           </div>
@@ -93,7 +105,7 @@
 import { ref, watch, inject } from 'vue';
 import router from '../router';
 import { useStore } from 'vuex';
-import { Search } from '@element-plus/icons-vue';
+import { Search, ArrowDown } from '@element-plus/icons-vue';
 import { Edit, Bell, User, House, Switch } from '@element-plus/icons-vue';
 import LoginOrRegister from '../pages/user/LoginOrRegister.vue';
 
@@ -106,20 +118,23 @@ store.state.LoginRegisterVisible = false
 
 const avatarUrl = ref(store.state.avatar)
 let searchInput = ref('')
-// 未读通知数量
-// let notificationNum = 2
+let searchType = ref(null)
+
+// 搜索的筛选条件改变
+function handleTypeChange(command) {
+  searchType.value = command
+}
 
 function toSearch() {
-  if (searchInput.value) {
+  if (searchInput.value && (searchType.value == 0 || searchType.value == 1)) {
     router.push({
       name: 'SearchResult',
-      query: { keyword: searchInput.value },
+      query: { keyword: searchInput.value, type: searchType.value },
     }); // 通过query携带关键词参数
-  } else {
-    Message({
-      message: '请输入搜索词',
-      type: 'warning',
-    });
+  } else if (!searchInput.value) {
+    ElMessage.warning('请输入搜索词');
+  } else if (searchType.value !=0 && searchType.value != 1) {
+    ElMessage.warning('请选择搜索的帖子类型');
   }
 }
 
@@ -307,5 +322,9 @@ watch(
   margin-left: 5px;
   font-size: 12px;
   color: var(--el-color-info);
+}
+
+.el-input-group__prepend {
+  width: 90px;
 }
 </style>

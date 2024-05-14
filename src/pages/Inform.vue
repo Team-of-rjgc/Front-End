@@ -14,6 +14,7 @@
         v-for="(note, index) in notifications"
         :key="note.lostFoundId"
         @click="goToPostDetail(note)"
+        v-if="notifications.length"
       >
         <el-checkbox
           v-model="selections[note.id]"
@@ -32,8 +33,13 @@
           <div class="notification-time">{{ note.time }}</div>
         </div>
       </div>
+
+      <div class="justify-align-center" v-else>
+        <el-empty description="暂无通知" />
+      </div>
     </div>
   </div>
+  <el-backtop :right="100" :bottom="100" />
 </template>
 <script setup>
 import { onMounted, ref, inject } from 'vue';
