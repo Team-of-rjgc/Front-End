@@ -102,7 +102,7 @@ function checkEdit () {
   const reg = /^.{1,16}$/
   if (newName.value === '') {
     newName.value = info.name
-    showMessage('用户名不能为空！', 'error')
+    $Tools.showMessage('用户名不能为空！', 'error')
   } else if(newName.value === info.name) {
     info.isEdit = !info.isEdit
   } else if (reg.test(newName.value)) {
@@ -121,7 +121,7 @@ function checkEdit () {
       })
     info.isEdit = !info.isEdit
   } else {
-    showMessage('用户名必须为6-16位任意字符！','error')
+    $Tools.showMessage('用户名必须为6-16位任意字符！','error')
   }
 }
 

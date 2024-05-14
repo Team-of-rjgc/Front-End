@@ -52,10 +52,14 @@
 <script setup>
 import { reactive, computed, ref, onMounted, inject, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
 const $API = inject('$API');
 const route = useRoute();
 const router = useRouter();
-console.log(route.query.keyword);
+const store = useStore();
+
+// console.log(route.query.keyword);
 let searchKeyword = ref(''); // 定义搜索关键词
 let fit = ref('fill');
 let pageSize = ref(10);
@@ -128,6 +132,16 @@ watch(
     searchKeyword.value = route.query.keyword || ''
     fetchPosts()
   }
+)
+
+watch(
+  () => store.state.isLogin,
+  (val) => {
+    if (val) {
+      fetchPosts()
+    }
+  },
+  { immediate: true }
 )
 </script>
 

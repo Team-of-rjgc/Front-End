@@ -99,10 +99,12 @@ import { ref, onMounted, inject } from 'vue';
 import { useRoute } from 'vue-router';
 import router from '../../router'
 import { Position, CollectionTag, Delete } from '@element-plus/icons-vue'
+import { useStore } from 'vuex';
 
 const $API = inject('$API');
 const $Tools = inject('$Tools');
 const route = useRoute();
+const store = useStore();
 
 const post = ref({
   imgUrls: [], // 确保imgUrls被初始化为一个空数组
@@ -119,6 +121,10 @@ const comments = ref([
 
 const newComment = ref('');
 const submitComment = async () => {
+  if (store.state.isLogin === false) {
+    store.state.LoginRegisterVisible = true
+    return
+  }
   const postId = route.query.id; // 使用查询参数获取postId
   if (newComment.value.trim() === '') {
     ElMessage.warning('请填写评论内容');
@@ -205,7 +211,10 @@ onMounted(async () => {
 
 // 删除自己的帖子
 function deletePost() {
-  console.log(post.value.id)
+  if (store.state.isLogin === false) {
+    store.state.LoginRegisterVisible = true
+    return
+  }
   $API.post.removeLost({idList: [post.value.id]})
     .then(({data}) => {
       console.log(data)

@@ -374,15 +374,15 @@ function getEmailCode(type) {
       .then(({ data }) => {
         // console.log(data)
         if (data.code === 1000) {
-          showMessage('获取成功，请前往邮箱查看。','success')
+          $Tools.showMessage('获取成功，请前往邮箱查看。','success')
         } else {
           console.log(data.msg);
-          showMessage(data.msg, 'error')
+          $Tools.showMessage(data.msg, 'error')
         }
       })
       .catch((err) => {
         console.log('err', err);
-        showMessage('获取验证码失败。', 'error')
+        $Tools.showMessage('获取验证码失败。', 'error')
       });
   } else if (type === 'reset') {
     $API.user
@@ -390,15 +390,15 @@ function getEmailCode(type) {
       .then(({ data }) => {
         // console.log(data)
         if (data.code === 1000) {
-          showMessage('获取成功，请前往邮箱查看。', 'success')
+          $Tools.showMessage('获取成功，请前往邮箱查看。', 'success')
         } else {
           console.log(data.msg);
-          showMessage(data.msg, 'error')
+          $Tools.showMessage(data.msg, 'error')
         }
       })
       .catch((err) => {
         console.log('err', err);
-        showMessage('获取验证码失败。', 'error')
+        $Tools.showMessage('获取验证码失败。', 'error')
       });
   }
 }
@@ -449,12 +449,12 @@ function toLogin(formEl) {
           } else {
             console.log(data.msg);
             getCodeImg(); // 重新获取验证码
-            showMessage(data.msg, 'error')
+            $Tools.showMessage(data.msg, 'error')
           }
         })
         .catch((err) => {
           console.log('err', err);
-          showMessage('登录失败！', 'error')
+          $Tools.showMessage('登录失败！', 'error')
         });
     } else {
       return false;
@@ -476,16 +476,16 @@ function toRegister(formEl) {
         .then(({ data }) => {
           // console.log(data)
           if (data.code === 1000) {
-            showMessage('注册成功！正在前往登录页...', 'success')
+            $Tools.showMessage('注册成功！正在前往登录页...', 'success')
             loginDialog.value = true;
           } else {
             console.log(data.msg);
-            showMessage(data.msg, 'error')
+            $Tools.showMessage(data.msg, 'error')
           }
         })
         .catch((err) => {
           console.log('err', err);
-          showMessage('注册失败！', 'error')
+          $Tools.showMessage('注册失败！', 'error')
         });
     } else {
       return false;
@@ -508,17 +508,17 @@ function forgetPwd(formEl) {
         .then(({ data }) => {
           // console.log(data)
           if (data.code === 1000) {
-            showMessage('重置成功！正在前往登录页...', 'success')
+            $Tools.showMessage('重置成功！正在前往登录页...', 'success')
             loginDialog.value = true;
             forgetDialog.value = false;
           } else {
             console.log(data.msg);
-            showMessage(data.msg, 'error')
+            $Tools.showMessage(data.msg, 'error')
           }
         })
         .catch((err) => {
           console.log('err', err);
-          showMessage('重置失败！', 'error')
+          $Tools.showMessage('重置失败！', 'error')
         });
     } else {
       return false;

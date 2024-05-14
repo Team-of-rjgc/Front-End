@@ -50,10 +50,13 @@
   <el-backtop :right="100" :bottom="100" />
 </template>
 <script setup>
-import { reactive, computed, ref, onMounted, inject } from 'vue';
+import { reactive, computed, ref, onMounted, inject, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
 const $API = inject('$API');
 const router = useRouter();
+const store = useStore();
 
 let fit = ref('fill');
 let pageSize = ref(10);
@@ -116,6 +119,16 @@ const handleCurrentChange = async (newCurrent) => {
 let goToPostDetail = (post) => {
   router.push({ name: 'foundDetail', query: { id: post.id } });
 };
+
+watch(
+  () => store.state.isLogin,
+  (val) => {
+    if (val) {
+      fetchPosts()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style>
