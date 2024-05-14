@@ -5,15 +5,21 @@
         :data="postList"
         style="width: 100%"
         @row-click="goToPostDetail"
+        :row-style="{height: '120px'}"
       >
         <el-table-column prop="title" label="标题"></el-table-column>
-        <el-table-column prop="content" label="内容"></el-table-column>
+        <el-table-column prop="content" label="内容">
+          <template v-slot="scope">
+            <p class="showOverTooltip">{{scope.row.content}}</p>
+          </template>
+        </el-table-column>
         <el-table-column label="图片">
           <template v-slot="scope">
             <el-image
               fit="cover"
               style="width: 100px; height: 100px"
               :src="scope.row.imgUrl"
+              v-if="scope.row.imgUrl"
             ></el-image>
           </template>
         </el-table-column>
@@ -44,7 +50,7 @@
   <el-backtop :right="100" :bottom="100" />
 </template>
 <script setup>
-import { reactive, computed, ref, onMounted, inject } from 'vue';
+import { reactive, computed, ref, onMounted, inject, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 const $API = inject('$API');
 const route = useRoute();
@@ -84,7 +90,7 @@ const fetchPosts = async () => {
     const newPostList = res.data.data.page.list.map((post) => ({
       ...post,
       content: post.about, // 使用 about 属性作为帖子的内容
-      imgUrl: `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${post.images[0]}`, // 使用 images 数组的第一个 URL 作为帖子图片的 URL
+      imgUrl: post.images[0] ?  `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${post.images[0]}` : '', // 使用 images 数组的第一个 URL 作为帖子图片的 URL
       iconUrl: `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${post.icon}`,
     }));
 
@@ -115,6 +121,14 @@ const handleCurrentChange = async (newCurrent) => {
 let goToPostDetail = (post) => {
   router.push({ name: 'foundDetail', query: { id: post.id } });
 };
+
+watch(
+  () => route.query.keyword,
+  () => {
+    searchKeyword.value = route.query.keyword || ''
+    fetchPosts()
+  }
+)
 </script>
 
 <style>
@@ -190,5 +204,14 @@ let goToPostDetail = (post) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.showOverTooltip{
+  display:-webkit-box;
+  text-overflow:ellipsis;
+  overflow:hidden;
+    /* 超过3行显示省略号 */
+  -webkit-line-clamp: 3;
+  -webkit-box-orient:vertical;
 }
 </style>

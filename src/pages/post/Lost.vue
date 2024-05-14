@@ -5,15 +5,21 @@
         :data="postList"
         style="width: 100%"
         @row-click="goToPostDetail"
+        :row-style="{height: '120px'}"
       >
         <el-table-column prop="title" label="标题"></el-table-column>
-        <el-table-column prop="content" label="内容"></el-table-column>
+        <el-table-column prop="content" label="内容">
+          <template v-slot="scope">
+            <p class="showOverTooltip">{{scope.row.content}}</p>
+          </template>
+        </el-table-column>
         <el-table-column label="图片">
           <template v-slot="scope">
             <el-image
               fit="cover"
               style="width: 100px; height: 100px"
               :src="scope.row.imgUrl"
+              v-if="scope.row.imgUrl"
             ></el-image>
           </template>
         </el-table-column>
@@ -76,13 +82,13 @@ const fetchPosts = async () => {
       pageNum: currentPage.value - 1, // 注意这里需要将页码传递给API
       pageSize: pageSize.value, // 和页数大小
     });
-    console.log(res.data.data.page.list);
+    // console.log(res.data.data.page.list);
     totalPosts.value = res.data.data.page.total; // 设置总帖子数的值
 
     const newPostList = res.data.data.page.list.map((post) => ({
       ...post,
       content: post.about, // 使用 about 属性作为帖子的内容
-      imgUrl: `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${post.images[0]}`, // 使用 images 数组的第一个 URL 作为帖子图片的 URL
+      imgUrl: post.images[0] ?  `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${post.images[0]}` : '', // 使用 images 数组的第一个 URL 作为帖子图片的 URL
       iconUrl: `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${post.icon}`,
     }));
 
@@ -185,5 +191,14 @@ let goToPostDetail = (post) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.showOverTooltip{
+  display:-webkit-box;
+  text-overflow:ellipsis;
+  overflow:hidden;
+    /* 超过3行显示省略号 */
+  -webkit-line-clamp: 3;
+  -webkit-box-orient:vertical;
 }
 </style>

@@ -48,7 +48,7 @@ const $API = inject('$API')
 const $Tools = inject('$Tools')
 
 if (!store.state.isLogin) {
-  router.push('/Lost')
+  router.replace('/Lost')
   store.state.LoginRegisterVisible = true
 }
 

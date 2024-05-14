@@ -135,7 +135,7 @@ function logOut() {
   store.state.userInfo = {};
   store.state.avatar = '';
   sessionStorage.clear();
-  router.push('/Lost');
+  router.replace('/Lost');
 }
 
 watch(
@@ -144,7 +144,7 @@ watch(
     if (val) {
       if (store.state.userInfo.icon) {
         $Tools
-          .downloadImg('upload_5096045757543304800.jpg')
+          .downloadImg(store.state.userInfo.icon)
           .then((res) => {
             avatarUrl.value = res;
             store.state.avatar = res;

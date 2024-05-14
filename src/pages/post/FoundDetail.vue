@@ -4,9 +4,16 @@
       <el-card class="box-card">
         <div slot="header" class="clearfix post-header">
           <div class="post-info">
-            <el-avatar class="post-avatar" :src="post.icon"></el-avatar>
-            <span class="header-author">由 {{ post.realName }} 发布</span>
+            <div class="post-info-top">
+              <div class="avatar-and-name">
+                <el-avatar class="post-avatar" :src="post.icon"></el-avatar>
+                <span class="header-author">由 {{ post.realName || post.userName || post.email }} 发布</span>
+              </div>
+              <el-tag>{{ post.kind == 0 ? '寻物启示' : '失物招领' }}</el-tag>
+            </div>
+            <span class="info-time">{{ post.time }}</span>
           </div>
+          <el-divider />
           <span class="header-title">{{ post.title }}</span>
         </div>
         <div v-if="post.imgUrls.length > 0" class="image-container">
@@ -24,6 +31,29 @@
           <p>{{ post.about }}</p>
           <!-- 可以用<p>标签包裹内容 -->
         </div>
+
+        <div class="description-box">
+          <div v-if="post.location" class="description-item">
+            <span><el-icon class="icon"><Position /></el-icon>丢失/拾到地点：</span>
+            <span>{{ post.location }}</span>
+          </div>
+          <div class="description-item">
+            <span><el-icon class="icon"><CollectionTag /></el-icon>类型：</span>
+            <span><el-tag>{{ post.category }}</el-tag></span>
+          </div>
+        </div>
+
+         <el-popconfirm 
+          width="200"
+          title="确定删除这篇帖子吗?" 
+          confirm-button-text="确定"
+          cancel-button-text="取消"
+          @confirm="deletePost"
+         >
+          <template #reference>
+            <div class="delete-btn" v-if="post.isSelf"><el-icon class="delete-icon"><Delete /></el-icon>删除</div>
+          </template>
+        </el-popconfirm>
       </el-card>
 
       <el-divider></el-divider>
@@ -38,6 +68,8 @@
             v-model="newComment"
             resize="none"
             class="comment-input"
+            maxlength="128"
+            show-word-limit
           ></el-input>
         </div>
         <el-button type="primary" @click="submitComment">发布评论</el-button>
@@ -65,7 +97,11 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue';
 import { useRoute } from 'vue-router';
+import router from '../../router'
+import { Position, CollectionTag, Delete } from '@element-plus/icons-vue'
+
 const $API = inject('$API');
+const $Tools = inject('$Tools');
 const route = useRoute();
 
 const post = ref({
@@ -121,7 +157,7 @@ const submitComment = async () => {
       // });
       newComment.value = '';
     } else {
-      ElMessage.error('评论发布失败');
+      ElMessage.error('评论发布失败' + response.data.msg);
     }
   } catch (error) {
     console.error(error);
@@ -145,6 +181,14 @@ onMounted(async () => {
       (imageName) =>
         `http://10.21.32.86:8080/api/v1/public/downloadImage?fileName=${imageName}`,
     ), // 为图片 URL 拼接上完整路径
+    userName: postData.userName,
+    location: postData.location,
+    isSelf: postData.isSelf,
+    kind: postData.kind,
+    category: postData.category,
+    email: postData.email,
+    time: postData.time,
+    id: postData.id,
   };
 
   // 获取评论信息，此处需要你提供API调用方式与返回数据的结构
@@ -158,6 +202,27 @@ onMounted(async () => {
   }));
   comments.value = commentsData;
 });
+
+// 删除自己的帖子
+function deletePost() {
+  console.log(post.value.id)
+  $API.post.removeLost({idList: [post.value.id]})
+    .then(({data}) => {
+      console.log(data)
+      if (data.code === 1000) {
+        $Tools.showMessage('删除帖子成功！', 'success')
+        if (post.kind == 0) router.replace('/Lost')
+        else router.replace('/Found')
+      } else {
+        console.log(data.msg);
+        $Tools.showMessage(data.msg, 'error')
+      }
+    })
+    .catch(err => {
+      console.log('err', err)
+      $Tools.showMessage('删除帖子失败！', 'error')
+    })
+}
 </script>
 
 <style scoped>
@@ -175,9 +240,15 @@ onMounted(async () => {
 }
 
 .post-info {
+  width: 100%;
+}
+
+.post-info-top {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem; /* 为标题和作者信息之间添加间距 */
+  width: 100%;
 }
 
 .post-avatar {
@@ -246,5 +317,60 @@ onMounted(async () => {
   font-size: 0.875rem;
   line-height: 1.5;
   color: #333;
+}
+
+.comment-input {
+  margin-bottom: 10px;
+}
+
+.description-box {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.description-item {
+  margin-top: 10px;
+
+  font-size: .9rem;
+  color: rgb(48, 49, 51);
+}
+
+.avatar-and-name {
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  color: var(--el-color-info-light-5);
+  font-size: 1rem;
+}
+
+.info-time {
+  margin-left: 3.5rem;
+  color: var(--el-color-info-light-3);
+}
+
+.delete-icon {
+  font-size: 1.2rem;
+}
+
+.delete-btn {
+  display: flex;
+  align-items: center;
+
+  margin-top: 20px;
+  width: 70px;
+
+  color: var(--el-color-info-light-3);
+  font-size: 1rem;
+
+  cursor: pointer;
+  transition: all .1s;
+}
+
+.delete-btn:hover {
+  color: var(--el-color-primary);
+  transition: all .1s;
 }
 </style>

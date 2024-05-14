@@ -48,7 +48,7 @@ import { useStore } from 'vuex';
 const store = useStore();
 
 if (!store.state.isLogin) {
-  router.push('/Lost');
+  router.replace('/Lost');
   store.state.LoginRegisterVisible = true;
 }
 </script>

@@ -32,7 +32,7 @@ export function comment(data) {
     data,
   });
 }
-//删除评论
+//删除帖子
 export function removeLost(data) {
   return request({
     url: '/api/v1/user/removeLost',

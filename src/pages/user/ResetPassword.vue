@@ -40,9 +40,10 @@ import { useStore } from "vuex"
 
 const store = useStore()
 const $API = inject('$API')
+const $Tools = inject('$Tools')
 
 if (!store.state.isLogin) {
-  router.push('/Lost')
+  router.replace('/Lost')
   store.state.LoginRegisterVisible = true
 }
 
@@ -126,15 +127,15 @@ function onSubmit (formEl) {
         .then(({data}) => {
           // console.log(data)
           if (data.code === 1000) {
-            showMessage('重置成功！', 'success')
+            $Tools.showMessage('重置成功！', 'success')
           } else {
             console.log(data.msg)
-            showMessage(data.msg, 'error')
+            $Tools.showMessage(data.msg, 'error')
           }
         })
         .catch((err) => {
           console.log('err', err)
-          showMessage('重置失败！', 'error')
+          $Tools.showMessage('重置失败！', 'error')
         })
     } else {
       return false
@@ -160,7 +161,7 @@ function getCode() {
   }, 1000);
 
   if (store.state.userInfo.email !== form.email) {
-    showMessage('该账号绑定的邮箱与输入的邮箱不符！', 'error')
+    $Tools.showMessage('该账号绑定的邮箱与输入的邮箱不符！', 'error')
     if (timer) clearInterval(timer)
     codeBtn.disabled = false
     codeBtn.msg = "获取验证码"
@@ -171,15 +172,15 @@ function getCode() {
     .then(({data}) => {
       // console.log(data)
       if (data.code === 1000) {
-        showMessage('获取成功，请前往邮箱查看。', 'success')
+        $Tools.showMessage('获取成功，请前往邮箱查看。', 'success')
       } else {
         console.log(data.msg)
-        showMessage(data.msg, 'error')
+        $Tools.showMessage(data.msg, 'error')
       }
     })
     .catch((err) => {
       console.log('err', err)
-      showMessage('获取验证码失败。', 'error')
+      $Tools.showMessage('获取验证码失败。', 'error')
     })
 }
 </script>
@@ -206,7 +207,8 @@ function getCode() {
 .get-verification-btn {
   position: absolute;
   width: 100px;
-  right: 0px;
+  right: -4px;
+  scale: .9;
 }
 
 :deep(.el-form .el-form-item__label) {

@@ -5,7 +5,7 @@
         <el-col :span="18"><h2>通知</h2></el-col>
         <el-col :span="6" class="text-right">
           <el-button type="danger" @click="deleteMultipleComments"
-            >批量删除</el-button
+            >批量删除评论</el-button
           >
         </el-col>
       </el-row>
@@ -26,9 +26,9 @@
         </el-checkbox>
         <el-avatar class="notification-avatar" :src="note.avatar"></el-avatar>
         <div class="notification-info">
-          <p>昵称: {{ note.title }}</p>
+          <p>帖子标题: {{ note.title }}</p>
           <p>评论内容: {{ note.content }}</p>
-          <p>来自: {{ note.author || '匿名' }}</p>
+          <p>来自用户: {{ note.author || '匿名' }}</p>
           <div class="notification-time">{{ note.time }}</div>
         </div>
       </div>
@@ -47,7 +47,7 @@ const notifications = ref([]);
 const selectedComments = ref([]); // 用于存储选中的评论ID
 const selections = ref({}); // 响应式变量存储每个复选框的选中状态
 if (!store.state.isLogin) {
-  router.push('/Lost');
+  router.replace('/Lost');
   store.state.LoginRegisterVisible = true;
 }
 

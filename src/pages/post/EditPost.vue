@@ -59,7 +59,7 @@
 <script setup>
 import { reactive, ref, inject } from "vue";
 import { Plus } from '@element-plus/icons-vue'
-import router from "../../router";
+import router from '../../router'
 
 const $API = inject('$API')
 const $Tools = inject('$Tools')
@@ -179,8 +179,12 @@ function sendPublishRequest() {
     .then(({data}) => {
       if (data.code === 1000) {
         $Tools.showMessage('发布成功！', 'success')
-        if (post.applyKind === 1) router.push('/Found')
-        else router.push('/Lost')
+        if (post.applyKind == 1) {
+          router.push('/Found')
+        }
+        else {
+          router.push('/Lost')
+        }
       } else {
         console.log(data.msg);
         $Tools.showMessage(data.msg, 'error')

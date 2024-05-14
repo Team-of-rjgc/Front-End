@@ -47,7 +47,7 @@ const store = useStore()
 let ifEmpty = false
 
 if (!store.state.isLogin) {
-  router.push('/Lost')
+  router.replace('/Lost')
   store.state.LoginRegisterVisible = true
 }
 
